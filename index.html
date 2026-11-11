@@ -107,7 +107,7 @@ function buildAdjacentCorridors(areas){
 }
 function buildFloor(){
  clear(gridGroup);clear(markerGroup);clear(detailGroup);
- const floor=data.floors.find(f=>f.id===floorId);document.querySelector('#floorSub').textContent=floor.subtitle;
+ const floor=data.floors.find(f=>f.id===floorId);const floorSub=document.querySelector('#floorSub');if(floorSub)floorSub.textContent=floor.subtitle;
  document.querySelector('#lower').classList.toggle('active',floorId==='lower');document.querySelector('#upper').classList.toggle('active',floorId==='upper');
  const slab=new THREE.Mesh(new THREE.BoxGeometry(43,.48,43),matFloor);slab.position.y=-.28;slab.receiveShadow=true;gridGroup.add(slab);
  const under=new THREE.Mesh(new THREE.BoxGeometry(43,.28,43),matDark);under.position.y=-.64;gridGroup.add(under);
