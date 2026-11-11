@@ -326,30 +326,41 @@ function buildZone(a,i){
 function buildHallSegment(a,b,width=1.85){
  const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz);
  if(len<.2)return;
- const horizontal=Math.abs(dx)>=Math.abs(dz),midX=(a[0]+b[0])/2,midZ=(a[1]+b[1])/2;
- const deck=new THREE.Mesh(new THREE.BoxGeometry(horizontal?len:width,.16,horizontal?width:len),new THREE.MeshStandardMaterial({color:0x505b60,metalness:.45,roughness:.78}));
- deck.position.set(midX,.10,midZ);deck.receiveShadow=true;gridGroup.add(deck);
- const plate=new THREE.MeshStandardMaterial({color:0x7a8588,metalness:.55,roughness:.62});
- for(let n=0;n<Math.max(2,Math.floor(len/.72));n++){
-  const t=(n+.5)/Math.max(2,Math.floor(len/.72));
-  const px=a[0]+dx*t,pz=a[1]+dz*t;
-  const panel=new THREE.Mesh(new THREE.BoxGeometry(horizontal?.62:width-.18,.025,horizontal?width-.18:.62),plate);
-  panel.position.set(px,.20,pz);gridGroup.add(panel);
+ // Build the corridor along its true bearing. The previous version treated
+ // diagonal links as axis-aligned boxes, leaving gaps and blocking routes.
+ const hall=new THREE.Group();
+ hall.position.set((a[0]+b[0])/2,.0,(a[1]+b[1])/2);
+ hall.rotation.y=-Math.atan2(dz,dx);
+ const deck=new THREE.Mesh(new THREE.BoxGeometry(len,.16,width),new THREE.MeshStandardMaterial({color:0x626d70,metalness:.28,roughness:.86}));
+ deck.position.y=.10;deck.receiveShadow=true;hall.add(deck);
+ const plate=new THREE.MeshStandardMaterial({color:0x879092,metalness:.32,roughness:.72});
+ const seam=new THREE.MeshStandardMaterial({color:0x30393c,metalness:.25,roughness:.86});
+ const count=Math.max(2,Math.floor(len/.72));
+ for(let n=0;n<count;n++){
+  const x=-len/2+(n+.5)*len/count;
+  const panel=new THREE.Mesh(new THREE.BoxGeometry(len/count-.045,.025,width-.18),plate);
+  panel.position.set(x,.20,0);hall.add(panel);
+  const line=new THREE.Mesh(new THREE.BoxGeometry(.025,.03,width-.2),seam);
+  line.position.set(x+len/count/2-.02,.218,0);hall.add(line);
  }
- const wallMat=new THREE.MeshStandardMaterial({color:0x58656a,metalness:.35,roughness:.82});
+ const wallMat=new THREE.MeshStandardMaterial({color:0x687579,metalness:.25,roughness:.88});
+ const kickMat=new THREE.MeshStandardMaterial({color:0xa18454,metalness:.42,roughness:.68});
  for(const side of [-1,1]){
-  const offset=side*width/2;
-  const wx=horizontal?midX:midX+offset,wz=horizontal?midZ+offset:midZ;
-  const wall=new THREE.Mesh(new THREE.BoxGeometry(horizontal?len: .16,1.95,horizontal?.16:len),wallMat);
-  wall.position.set(wx,1.05,wz);wall.castShadow=true;wall.receiveShadow=true;gridGroup.add(wall);
-  const kick=new THREE.Mesh(new THREE.BoxGeometry(horizontal?len:.2,.20,horizontal?.2:len),new THREE.MeshStandardMaterial({color:0x9b7845,metalness:.55,roughness:.62}));
-  kick.position.set(wx,.34,wz);gridGroup.add(kick);
+  const wall=new THREE.Mesh(new THREE.BoxGeometry(len,1.95,.16),wallMat);
+  wall.position.set(0,1.05,side*(width/2));wall.castShadow=true;wall.receiveShadow=true;hall.add(wall);
+  const kick=new THREE.Mesh(new THREE.BoxGeometry(len,.20,.19),kickMat);
+  kick.position.set(0,.34,side*(width/2));hall.add(kick);
+  for(let n=0;n<Math.floor(len/1.8);n++){
+   const rib=new THREE.Mesh(new THREE.BoxGeometry(.09,1.75,.22),plate);
+   rib.position.set(-len/2+.9+n*1.8,1.02,side*(width/2-.03));hall.add(rib);
+  }
  }
- const service=new THREE.Mesh(new THREE.BoxGeometry(horizontal?len:.14,.12,horizontal?.14:len),new THREE.MeshStandardMaterial({color:0x242d31,metalness:.55,roughness:.72}));
- service.position.set(midX,1.98,midZ);gridGroup.add(service);
- const light=new THREE.Mesh(new THREE.BoxGeometry(horizontal?Math.min(1.5,len):.18,.055,horizontal?.18:Math.min(1.5,len)),new THREE.MeshBasicMaterial({color:0xc4d7d3}));
- light.position.set(midX,1.82,midZ);gridGroup.add(light);
- const point=new THREE.PointLight(0xa8c7c8,.28,6,2);point.position.set(midX,1.68,midZ);gridGroup.add(point);
+ const service=new THREE.Mesh(new THREE.BoxGeometry(len,.12,.20),new THREE.MeshStandardMaterial({color:0x293438,metalness:.48,roughness:.72}));
+ service.position.set(0,1.98,0);hall.add(service);
+ const light=new THREE.Mesh(new THREE.BoxGeometry(Math.min(1.4,len),.055,.2),new THREE.MeshBasicMaterial({color:0xd6e1d8}));
+ light.position.set(0,1.82,0);hall.add(light);
+ const point=new THREE.PointLight(0xb7d0c7,.34,7,2);point.position.set(0,1.68,0);hall.add(point);
+ gridGroup.add(hall);
 }
 function buildArchitecturalLinks(areas){
  const byName=Object.fromEntries(areas.map(a=>[a.name,a]));
