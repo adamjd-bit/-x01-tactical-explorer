@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#101512">
+<title>MW4 DMZ | FOB Tactical Explorer</title>
+<style>
+:root{color-scheme:dark;--bg:#101512;--panel:#111a17ed;--line:#64765d;--green:#a9bd7d;--cream:#eee9d9;--muted:#a4ada1;--yellow:#e3bd65}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--cream);font:13px/1.4 system-ui,-apple-system,Segoe UI,sans-serif}
+#scene{position:absolute;inset:0}canvas{display:block;width:100%;height:100%;touch-action:none}
+header{position:absolute;z-index:4;top:0;left:0;right:0;padding:14px 18px 25px;background:linear-gradient(180deg,#080d0bea,transparent);pointer-events:none}
+.brand{font-size:10px;letter-spacing:.2em;font-weight:900;color:var(--green)}h1{font-size:18px;letter-spacing:.07em;margin:3px 0 0;font-weight:800}.subhead{font-size:10px;color:#c2c9bd;letter-spacing:.08em}
+#toolbar{position:absolute;z-index:5;top:100px;left:14px;display:flex;gap:6px;flex-wrap:wrap;max-width:calc(100vw - 28px);padding:7px;background:#101914df;border:1px solid #74866a;border-radius:8px;backdrop-filter:blur(10px)}
+button{background:#29362c;color:var(--cream);border:1px solid #77886b;border-radius:5px;padding:8px 11px;font-size:10px;font-weight:800;letter-spacing:.05em}
+button.active{background:#9caf73;color:#10150f;border-color:#c3d29e}
+#stationlist{position:absolute;z-index:5;right:14px;top:100px;width:205px;max-height:calc(100vh - 225px);overflow:auto;padding:10px;background:#101914e8;border:1px solid #64765d;border-radius:8px;backdrop-filter:blur(10px)}
+.kicker{font-size:9px;color:var(--green);letter-spacing:.17em;font-weight:900;margin:0 0 7px}
+.station{display:flex;justify-content:space-between;gap:8px;width:100%;margin:3px 0;text-align:left;padding:7px 8px;background:#1a251e;border-color:#435545;font-size:10px}
+.station small{color:#a5b19e;font-size:8px;font-weight:600}
+#prompt{position:absolute;z-index:6;left:50%;bottom:75px;transform:translateX(-50%);padding:10px 15px;background:#0c1412ed;border:1px solid #9bae70;border-radius:7px;text-align:center;min-width:220px;max-width:85vw;box-shadow:0 5px 20px #0009}
+#prompt strong{color:var(--yellow);letter-spacing:.08em;font-size:10px}#prompt div{font-size:11px;margin-top:3px}
+#status{position:absolute;z-index:4;left:14px;bottom:13px;padding:7px 9px;background:#101914d9;border:1px solid #53664f;border-radius:5px;color:#bdc7b6;font-size:9px;max-width:60vw}
+#legend{position:absolute;z-index:4;right:14px;bottom:13px;padding:7px 9px;background:#101914d9;border:1px solid #53664f;border-radius:5px;color:#aeb8a8;font-size:9px}
+#touchpad{display:none;position:absolute;z-index:5;left:16px;bottom:65px;grid-template-columns:repeat(3,43px);grid-template-rows:repeat(2,43px);gap:4px}
+#touchpad button{padding:0;font-size:15px;background:#111a17dd;touch-action:none}
+#touchpad button:nth-child(1){grid-column:2}#touchpad button:nth-child(2){grid-column:1;grid-row:2}#touchpad button:nth-child(3){grid-column:2;grid-row:2}#touchpad button:nth-child(4){grid-column:3;grid-row:2}
+#closePanel{position:absolute;z-index:8;inset:0;display:none;align-items:center;justify-content:center;background:#050907a8;padding:20px}
+#closePanel.open{display:flex}.modal{width:min(430px,100%);padding:18px;background:#111a17f5;border:1px solid #91a66c;border-radius:10px;box-shadow:0 18px 55px #000c}.modal h2{font-size:16px;margin:0 0 5px}.modal p{color:#bdc6b8;font-size:12px}.modal .meta{font-size:9px;color:var(--green);letter-spacing:.12em;margin-bottom:9px}
+@media(max-width:650px){header{padding:10px 12px 20px}h1{font-size:14px}#toolbar{top:77px;left:9px;padding:5px;gap:4px}#toolbar button{padding:7px 8px;font-size:9px}#stationlist{top:auto;right:9px;bottom:62px;width:145px;max-height:37vh;padding:7px}.station{padding:6px;font-size:9px}#touchpad{display:grid}#legend{display:none}#status{bottom:9px;left:9px;font-size:8px}#prompt{bottom:118px;min-width:170px;padding:8px} }
+</style>
+</head>
+<body>
+<div id="scene"></div>
+<header><div class="brand">THE VETERAN LOBBY · TACTICAL EXPLORER</div><h1>MW4 DMZ / FORWARD OPERATING BASE</h1><div class="subhead">FIELD RECONSTRUCTION · WOODLAND ENCAMPMENT</div></header>
+<div id="toolbar"><button id="orbit" class="active">ORBIT VIEW</button><button id="first">FIRST PERSON</button><button id="third">THIRD PERSON</button><button id="reset">RESET VIEW</button><button id="labels" class="active">STATION LABELS</button></div>
+<aside id="stationlist"><div class="kicker">FOB STATIONS</div><div id="stations"></div></aside>
+<div id="prompt"><strong>FOB FIELD GUIDE</strong><div>Choose a station or explore the encampment</div></div>
+<div id="status">INITIALISING FOB ENVIRONMENT…</div><div id="legend">WASD / ARROWS · DRAG TO LOOK · E TO INTERACT</div>
+<div id="touchpad"><button data-move="forward">▲</button><button data-move="left">◀</button><button data-move="back">▼</button><button data-move="right">▶</button></div>
+<div id="closePanel"><div class="modal"><div class="meta">FOB STATION INTERFACE</div><h2 id="modalTitle">Station</h2><p id="modalText"></p><button id="dismiss">CLOSE</button></div></div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+const $=s=>document.querySelector(s),host=$('#scene');
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x82908a);scene.fog=new THREE.FogExp2(0x82908a,.009);
+const camera=new THREE.PerspectiveCamera(66,innerWidth/innerHeight,.1,500);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;host.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xcbd9d7,0x354036,1.45));
+const sun=new THREE.DirectionalLight(0xffe5c4,2.3);sun.position.set(-45,70,25);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-90;sun.shadow.camera.right=90;sun.shadow.camera.top=90;sun.shadow.camera.bottom=-90;sun.shadow.bias=-.00025;scene.add(sun);
+const fill=new THREE.DirectionalLight(0xb2c9d5,.45);fill.position.set(35,25,-45);scene.add(fill);
+const mat=(c,r=.85,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
+const soil=mat(0x49483d),pathmat=mat(0x777363),grassmat=mat(0x354533),grass2=mat(0x46533c),rockmat=mat(0x66665c),concrete=mat(0x74766e),olive=mat(0x454d3b),olive2=mat(0x626b4c),dark=mat(0x1c2421,.7,.35),metal=mat(0x59615e,.42,.72),canvas=mat(0x555c47,.96),canvas2=mat(0x73745d,.96),screenmat=mat(0x071b19,.35,.25),yellow=mat(0xc4a15b,.6,.25);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(230,230),soil);ground.rotation.x=-Math.PI/2;ground.position.y=-.2;ground.receiveShadow=true;scene.add(ground);
+function box(parent,x,y,z,w,h,d,material,cast=true){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);o.position.set(x,y,z);o.castShadow=cast;o.receiveShadow=true;parent.add(o);return o}
+function cyl(parent,x,y,z,rt,rb,h,material,seg=10){const o=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg),material);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
+function sphere(parent,x,y,z,r,material,seg=10){const o=new THREE.Mesh(new THREE.SphereGeometry(r,seg,seg),material);o.position.set(x,y,z);o.castShadow=true;parent.add(o);return o}
+function group(parent,x=0,y=0,z=0){const g=new THREE.Group();g.position.set(x,y,z);parent.add(g);return g}
+function path(points,width=5){const shape=new THREE.Shape();shape.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)shape.lineTo(points[i][0],points[i][1]);const geo=new THREE.ShapeGeometry(shape);const mesh=new THREE.Mesh(geo,pathmat);mesh.rotation.x=-Math.PI/2;mesh.position.y=.012;mesh.scale.set(1,1,width/5);mesh.receiveShadow=true;scene.add(mesh)}
+// Ground cover: irregular patches and low scrub rather than a flat coloured plane.
+for(let i=0;i<190;i++){const x=(Math.random()-.5)*190,z=(Math.random()-.5)*170;if(Math.abs(x)<28&&Math.abs(z)<25)continue;const p=new THREE.Mesh(new THREE.CircleGeometry(1+Math.random()*3,7),Math.random()>.5?grassmat:grass2);p.rotation.x=-Math.PI/2;p.position.set(x,.006,z);p.scale.set(1+Math.random(),.6+Math.random(),1);scene.add(p)}
+path([[-8,42],[-5,27],[-3,14],[0,2],[6,-12],[10,-28],[13,-43]],7);
+path([[-4,8],[-18,4],[-28,-5],[-40,-13]],4);
+path([[6,-12],[22,-14],[36,-22],[47,-31]],4);
+path([[1,17],[18,20],[29,28]],3.5);
+// Small gravel stones and boulders frame the clearings.
+for(let i=0;i<90;i++){const x=(Math.random()-.5)*100,z=(Math.random()-.5)*90;if(Math.abs(x)<23&&Math.abs(z)<20)continue;const r=.25+Math.random()*1.1;const o=sphere(scene,x,r*.35,z,r,rockmat,7);o.scale.set(1.2,.55,.9);o.rotation.set(Math.random(),Math.random(),Math.random())}
+// Trees with irregular trunks, layered crowns and branches.
+const trunkmat=mat(0x51483a),leafmats=[mat(0x344638),mat(0x435541),mat(0x59634b),mat(0x6b7050)];
+function tree(x,z,s=1){const g=group(scene,x,0,z);const h=5+s*4;cyl(g,0,h/2,0,.23*s,.34*s,h,trunkmat,8);for(let j=0;j<3;j++){const a=j*2.1;const b=cyl(g,Math.sin(a)*.45*s,h*.58+j*.55*s,Math.cos(a)*.45*s,.09*s,.16*s,h*.35, trunkmat,7);b.rotation.z=(Math.sin(a))*.5;b.rotation.x=(Math.cos(a))*.45}for(let j=0;j<5;j++){const y=h*.52+j*.62*s;const r=(2.3-j*.27)*s;const crown=new THREE.Mesh(new THREE.IcosahedronGeometry(r,1),leafmats[(j+Math.floor(Math.random()*3))%leafmats.length]);crown.position.set((Math.random()-.5)*.9*s,y,(Math.random()-.5)*.9*s);crown.scale.set(1,.8,1);crown.castShadow=true;crown.receiveShadow=true;g.add(crown)}}
+for(let i=0;i<90;i++){const a=Math.random()*Math.PI*2,r=48+Math.random()*42;tree(Math.cos(a)*r,Math.sin(a)*r,.65+Math.random()*.8)}
+// A few closer trees and rock faces establish the wooded basin seen in official FOB art.
+for(const [x,z,s] of [[-31,24,1.2],[34,30,1.1],[-39,-24,1.25],[43,-18,1.1],[-22,-39,.9],[28,-42,1.1]])tree(x,z,s);
+for(let i=0;i<12;i++){const r=3+Math.random()*5;const b=sphere(scene,-57+i*10,-.2+r*.3,-47+Math.sin(i)*4,r,rockmat,7);b.scale.set(1.4,.8,1)}
+// Tents and prefab field huts with visible frames, doors, lighting and interior equipment.
+function tent(x,z,w=9,d=7,angle=0){const g=group(scene,x,0,z);g.rotation.y=angle;box(g,0,.16,0,w,.28,d,mat(0x4c5143),false);const roof=new THREE.Mesh(new THREE.ConeGeometry(w*.72,3.2,4),canvas);roof.position.y=3.05;roof.rotation.y=Math.PI/4;roof.scale.set(1,d/w,1);roof.castShadow=true;g.add(roof);box(g,0,1.35,d*.49,w*.75,2.3,.18,canvas2);box(g,0,1.3,-d*.49,w*.75,2.2,.18,canvas);for(const sx of [-w*.49,w*.49])box(g,sx,1.35,0,.16,2.5,d,metal);for(const sx of [-w*.35,w*.35])cyl(g,sx,1.3,0,.06,.06,2.6,metal,7);box(g,0,2.2,0,w*.75,.12,.12,metal);box(g,0,1.15,d*.37,w*.9,.12,.12,metal);return g}
+function hut(x,z,w=10,d=8,angle=0,open=true){const g=group(scene,x,0,z);g.rotation.y=angle;box(g,0,.16,0,w,.32,d,concrete);for(const sx of [-w/2,w/2])box(g,sx,2.05,0,.3,3.8,d,olive);box(g,0,2.05,-d/2,w,3.8,.3,olive);if(!open)box(g,0,2.05,d/2,w,3.8,.3,olive);else{box(g,-w*.36,2.05,d/2,.3,3.8,.3,olive);box(g,w*.36,2.05,d/2,.3,3.8,.3,olive);box(g,0,3.82,d/2,w*.72,.28,.3,olive)}const roof=box(g,0,4,0,w+.8,.28,d+.8,mat(0x303a31,.8,.25));for(const z2 of [-d*.35,d*.35])box(g,0,2.4,z2,w*.94,.12,.12,metal);box(g,0,.7,-d/2-.02,w*.5,1.2,.08,dark);return g}
+function sign(parent,text,x,y,z){const c=document.createElement('canvas');c.width=512;c.height=128;const ctx=c.getContext('2d');ctx.fillStyle='#121a16';ctx.fillRect(0,0,512,128);ctx.strokeStyle='#a7b978';ctx.lineWidth=7;ctx.strokeRect(5,5,502,118);ctx.fillStyle='#e7e5d6';ctx.font='bold 38px Arial';ctx.textAlign='center';ctx.fillText(text.toUpperCase(),256,78);const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;const m=new THREE.Mesh(new THREE.PlaneGeometry(4.8,1.2),new THREE.MeshBasicMaterial({map:tex,transparent:true,side:THREE.DoubleSide}));m.position.set(x,y,z);parent.add(m);return m}
+function workbench(parent,x,z,label,kind='desk'){const g=group(parent,x,0,z);box(g,0,1.1,0,3.3,.18,1.35,mat(0x303633,.65,.45));for(const sx of [-1.35,1.35])for(const sz of [-.48,.48])box(g,sx,.53,sz,.12,1.05,.12,metal);box(g,0,.34,0,2.8,.16,1.05,olive);for(let i=0;i<2;i++){const m=box(g,-.65+i*1.3,1.95,-.42,1.05,.72,.1,screenmat);m.rotation.x=-.08;box(g,-.65+i*1.3,1.58,-.4,1.1,.06,.55,dark)}box(g,.35,1.24,.28,.5,.06,.3,metal);if(kind==='printer'){box(g,0,2.25,.05,1.65,1.9,1.45,dark);box(g,0,2.3,.8,1.15,1.3,.05,mat(0x283c37,.3,.35));box(g,0,2.4,.84,.65,.08,.03,mat(0x6ed4bd,.25,.2));cyl(g,0,3.45,0,.08,.08,.25,metal)}if(kind==='gunsmith'){for(let i=0;i<3;i++){const gun=box(g,-.7+i*.7,1.75,.15,.1,.1,1.5,dark);gun.rotation.y=.18}}if(kind==='vendor'){for(let i=0;i<3;i++)box(g,-.9+i*.9,.35,.15,.6,.45,.55,olive2)}return g}
+const stations=[
+{id:'operators',name:'Operators',unlock:'Available immediately',desc:'Active Duty operator roster, status, traits and operator selection.',pos:[-17,0,3],kind:'operators'},
+{id:'orders',name:'DMZ Orders',unlock:'Available immediately',desc:'Mission directives, objectives, rewards and deployment preparation.',pos:[-5,0,12],kind:'orders'},
+{id:'stash',name:'Stash / Loadout',unlock:'Available immediately',desc:'Offload extracted loot, manage stored gear and equip your next deployment.',pos:[11,0,8],kind:'stash'},
+{id:'range',name:'Firing Range',unlock:'Available immediately',desc:'Wooded firing lane with target stands at increasing distances.',pos:[35,0,17],kind:'range'},
+{id:'survival',name:'Survival Kits',unlock:'Available immediately',desc:'Open themed packs of supplies for crafting and deployment preparation.',pos:[-19,0,-12],kind:'survival'},
+{id:'bounty',name:'Bounty Leaderboard',unlock:'Available immediately',desc:'Review the most successful PvP hunters and killers.',pos:[-5,0,-16],kind:'bounty'},
+{id:'printer',name:'3D Printer',unlock:'DMZ Player Level 2',desc:'Craft gear and ingredients, and use resources to upgrade FOB stations.',pos:[11,0,-15],kind:'printer'},
+{id:'boss',name:'Boss Board',unlock:'After second DMZ Order',desc:'Purchase lieutenant intel and prepare to hunt Hajin commanders.',pos:[23,0,-8],kind:'boss'},
+{id:'vendor',name:'Vendor',unlock:'DMZ Player Level 5',desc:'Purchase rotating weapons and equipment using DMZ Cash.',pos:[-26,0,-27],kind:'vendor'},
+{id:'gunsmith',name:'Gunsmith',unlock:'DMZ Player Level 10',desc:'Build weapons and purchase compatible attachments.',pos:[-10,0,-31],kind:'gunsmith'},
+{id:'dogtags',name:'Dog Tag Case',unlock:'DMZ Player Level 20',desc:'Display collected Operator dog tags and favourites.',pos:[8,0,-31],kind:'dogtags'},
+{id:'progression',name:'DMZ Progression',unlock:'Available immediately',desc:'Track the DMZ progression path, station unlocks and printer recipes.',pos:[23,0,8],kind:'progression'},
+{id:'events',name:'Events',unlock:'Available immediately',desc:'Review current DMZ events and featured activities.',pos:[-29,0,14],kind:'events'},
+{id:'deploy',name:'Deploy',unlock:'Available immediately',desc:'Razor-wire deployment threshold and heavy-lift transport helicopter.',pos:[8,0,42],kind:'deploy'}
+];
+const stationObjects=[];
+for(const s of stations){const [x,_,z]=s.pos;let g;
+if(s.kind==='range'){g=group(scene,x,0,z);for(let i=0;i<5;i++){const dist=7+i*8;box(g,0,.08,-dist,11,.16,.5,soil);const pole=box(g,0,1.1,-dist, .12,2.2,.12,metal);box(g,2.2,1.7,-dist,1.6,.12,.12,dark);cyl(g,0,1.8,-dist,.62,.62,.12,mat(0xa8a99b),24);cyl(g,0,1.8,-dist,.12,.12,.14,mat(0x9c5145),16)}}
+else if(s.kind==='deploy'){g=group(scene,x,0,z);hut(x,z,9,7,0,true);for(let i=0;i<6;i++){const post=box(g,-8+i*3,.9,2,.12,1.8,.12,metal);for(let j=0;j<3;j++){const barb=cyl(g,-8+i*3,.9+j*.48,2,.025,.025,2.7,metal,5);barb.rotation.z=Math.PI/2}}// stylised transport helicopter silhouette
+const heli=group(g,0,0,-8);box(heli,0,3.5,0,7,2.2,2.5,dark);sphere(heli,3.3,3.65,0,1.2,metal,12);box(heli,-4,3.4,0,2.8,.25,.35,metal);box(heli,-5.4,3.7,0,.25,1.3,2.4,metal);cyl(heli,0,5.2,0,.08,.08,3,metal);const rotor=box(heli,0,6.65,0,18,.08,.18,dark);rotor.rotation.y=.18;for(let i=0;i<2;i++){const skid=box(heli,0,2.2,-.9+i*1.8,6,.12,.12,metal)}}
+else{g=hut(x,z,s.kind==='printer'?11:9,8,s.kind==='vendor'?.2:0,true);if(s.kind==='operators'||s.kind==='orders'||s.kind==='boss'||s.kind==='progression'||s.kind==='events'){for(let i=0;i<2;i++)workbench(g,-1.9+i*3.8,0,s.name)}else if(s.kind==='stash'||s.kind==='survival'||s.kind==='dogtags'){for(let i=0;i<4;i++){const crate=box(g,-3.2+(i%2)*6,.65,-2+Math.floor(i/2)*3,2.2,1.3,1.8,i%2?olive2:olive);crate.rotation.y=(i%2)*.12}}else workbench(g,0,-1,s.name,s.kind);if(s.kind==='printer'){box(g,0,1.5,-3.65,3.6,2.6,.16,dark);box(g,0,2.4,-3.52,2.4,.12,.08,mat(0x61cbb2,.3,.15))}}
+if(s.kind!=='range'&&s.kind!=='deploy')sign(g,s.name,0,4.9,4.1);
+const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,1.6,8),new THREE.MeshStandardMaterial({color:0xb5c987,emissive:0x263d18}));beacon.position.set(x,5.6,z);beacon.castShadow=true;scene.add(beacon);
+const ring=new THREE.Mesh(new THREE.TorusGeometry(1.1,.035,6,24),new THREE.MeshBasicMaterial({color:0xc1d68c}));ring.rotation.x=Math.PI/2;ring.position.set(x,.18,z);scene.add(ring);
+stationObjects.push({data:s,object:g,beacon,ring});
+}
+// Small satellite dishes, solar panels, antenna masts, utility crates, floodlights and cables.
+function dish(x,z){const g=group(scene,x,0,z);cyl(g,0,1.4,0,.1,.16,2.8,metal);const d=new THREE.Mesh(new THREE.SphereGeometry(1,18,12,0,Math.PI*2,0,Math.PI/2),mat(0xb9c0b9,.5,.5));d.position.set(0,2.8,0);d.scale.set(1.5,.2,1.5);d.rotation.x=-.25;g.add(d);cyl(g,0,2.9,0,.05,.05,.8,metal);return g}
+dish(-34,4);dish(30,-33);for(let i=0;i<3;i++){const panel=box(scene,-31+i*2,.9,25,1.6,.12,2.8,mat(0x253d42,.35,.55));panel.rotation.z=-.18}
+for(let i=0;i<14;i++){const x=-35+Math.random()*70,z=-36+Math.random()*72;if(Math.abs(x)<26&&Math.abs(z)<23)continue;box(scene,x,.6,z,1.3,1.2,1.3,i%2?olive:dark)}
+for(const x of [-31,31]){cyl(scene,x,4,8,.12,.12,8,metal,8);for(let y=2;y<7;y+=1.4)box(scene,x,y,8,1.1,.05,.05,yellow)}
+// Player marker/avatar. In first person only the camera is visible; third person follows this operator.
+const player=group(scene,0,0,27);const body=box(player,0,1.15,0,.8,1.25,.42,mat(0x353f37));const head=sphere(player,0,2,0,.3,mat(0x33352e));const pack=box(player,0,1.35,-.34,.62,.9,.25,olive2);const legs=[];for(const x of [-.22,.22])legs.push(box(player,x,.42,0,.24,.82,.28,dark));
+let mode='orbit',yaw=Math.PI,pitch=-.12,orbitYaw=.7,orbitPitch=.52,orbitDistance=76,playerYaw=0,move={forward:false,back:false,left:false,right:false},dragging=false,lastX=0,lastY=0,activeStation=null,showLabels=true;
+const target=new THREE.Vector3(0,1,0);const raycaster=new THREE.Raycaster(),mouse=new THREE.Vector2();
+function setMode(m){mode=m;for(const id of ['orbit','first','third'])$('#'+id).classList.toggle('active',id===(m==='orbit'?'orbit':m==='first'?'first':'third'));$('#status').textContent=m==='orbit'?'ORBIT VIEW · DRAG TO ROTATE · WHEEL TO ZOOM':m==='first'?'FIRST PERSON · WASD TO MOVE · E TO INTERACT':'THIRD PERSON · WASD TO MOVE · E TO INTERACT';}
+function chooseStation(s){activeStation=s;$('#prompt').innerHTML='<strong>INTERACT · '+s.name.toUpperCase()+'</strong><div>'+s.unlock+' · Press E / tap to inspect</div>';const p=$('#prompt');p.style.display='block';}
+function openStation(s){$('#modalTitle').textContent=s.name;$('#modalText').textContent=s.desc+' Unlock status: '+s.unlock+'. This is an interactive reconstruction panel; game account functions are not connected.';$('#closePanel').classList.add('open')}
+function nearest(){let best=null,bd=9;for(const s of stations){const d=Math.hypot(player.position.x-s.pos[0],player.position.z-s.pos[2]);if(d<bd){best=s;bd=d}}return best}
+function updateCamera(){if(mode==='orbit'){const cp=Math.cos(orbitPitch);camera.position.set(target.x+Math.sin(orbitYaw)*cp*orbitDistance,target.y+Math.sin(orbitPitch)*orbitDistance,target.z+Math.cos(orbitYaw)*cp*orbitDistance);camera.lookAt(target)}else{const eye=new THREE.Vector3(player.position.x,mode==='first'?1.72:4.4,player.position.z);if(mode==='first'){camera.position.copy(eye);camera.rotation.order='YXZ';camera.rotation.set(pitch,yaw,0)}else{const back=new THREE.Vector3(Math.sin(playerYaw),0,Math.cos(playerYaw)).multiplyScalar(-7);camera.position.set(eye.x+back.x,eye.y+1.2,eye.z+back.z);camera.lookAt(player.position.x,1.6,player.position.z)}}}
+function movePlayer(dt){const speed=mode==='first'?7:6;const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));if(mode==='third')forward.set(-Math.sin(playerYaw),0,-Math.cos(playerYaw));const right=new THREE.Vector3(forward.z,0,-forward.x);let v=new THREE.Vector3();if(move.forward||keys.KeyW||keys.ArrowUp)v.add(forward);if(move.back||keys.KeyS||keys.ArrowDown)v.sub(forward);if(move.right||keys.KeyD||keys.ArrowRight)v.add(right);if(move.left||keys.KeyA||keys.ArrowLeft)v.sub(right);if(v.lengthSq()){v.normalize().multiplyScalar(speed*dt);player.position.add(v);player.position.x=THREE.MathUtils.clamp(player.position.x,-49,49);player.position.z=THREE.MathUtils.clamp(player.position.z,-49,49);if(mode==='third')playerYaw=Math.atan2(-v.x,-v.z);player.visible=mode==='third'}else player.visible=mode==='third';}
+function updateStationUI(){const list=$('#stations');list.innerHTML='';for(const s of stations){const b=document.createElement('button');b.className='station';b.innerHTML='<span>'+s.name+'</span><small>'+s.unlock+'</small>';b.addEventListener('click',()=>{setMode('orbit');target.set(s.pos[0],1,s.pos[2]);orbitDistance=17;updateCamera();openStation(s)});list.appendChild(b)}}
+updateStationUI();setMode('orbit');updateCamera();
+$('#orbit').onclick=()=>setMode('orbit');$('#first').onclick=()=>{setMode('first');player.visible=false;player.position.set(0,0,27);yaw=Math.PI;pitch=-.08;updateCamera()};$('#third').onclick=()=>{setMode('third');player.position.set(0,0,27);playerYaw=0;updateCamera()};$('#reset').onclick=()=>{target.set(0,1,0);orbitYaw=.7;orbitPitch=.52;orbitDistance=76;player.position.set(0,0,27);setMode('orbit');updateCamera()};$('#labels').onclick=e=>{showLabels=!showLabels;e.currentTarget.classList.toggle('active',showLabels);for(const s of stationObjects){s.beacon.visible=showLabels;s.ring.visible=showLabels}};
+$('#dismiss').onclick=()=>$('#closePanel').classList.remove('open');
+window.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyE'&&mode!=='orbit'){const s=nearest();if(s)openStation(s)}if(e.code==='Escape')$('#closePanel').classList.remove('open')});window.addEventListener('keyup',e=>keys[e.code]=false);
+for(const b of document.querySelectorAll('#touchpad button')){const k=b.dataset.move;b.addEventListener('pointerdown',e=>{e.preventDefault();move[k]=true;b.setPointerCapture(e.pointerId)});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>b.addEventListener(ev,()=>move[k]=false))}
+renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;lastY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId);if(mode==='orbit'){const rect=renderer.domElement.getBoundingClientRect();mouse.x=(e.clientX-rect.left)/rect.width*2-1;mouse.y=-(e.clientY-rect.top)/rect.height*2+1;raycaster.setFromCamera(mouse,camera);const hits=raycaster.intersectObjects(stationObjects.map(s=>s.object),true);if(hits.length){const hit=stationObjects.find(s=>s.object===hits[0].object||s.object.getObjectByProperty('uuid',hits[0].object.uuid));if(hit)openStation(hit.data)}}});
+renderer.domElement.addEventListener('pointermove',e=>{if(!dragging)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;if(mode==='orbit'){orbitYaw-=dx*.006;orbitPitch=THREE.MathUtils.clamp(orbitPitch+dy*.005,-.05,1.35)}else{yaw-=dx*.004;pitch=THREE.MathUtils.clamp(pitch-dy*.004,-1.2,1.2);if(mode==='third')playerYaw=yaw} });
+renderer.domElement.addEventListener('pointerup',()=>dragging=false);renderer.domElement.addEventListener('pointercancel',()=>dragging=false);
+renderer.domElement.addEventListener('wheel',e=>{if(mode==='orbit')orbitDistance=THREE.MathUtils.clamp(orbitDistance+e.deltaY*.045,12,130);else camera.fov=THREE.MathUtils.clamp(camera.fov+e.deltaY*.025,40,85);camera.updateProjectionMatrix()},{passive:true});
+let previous=performance.now();function animate(now){requestAnimationFrame(animate);const dt=Math.min((now-previous)/1000,.04);previous=now;if(mode!=='orbit')movePlayer(dt);updateCamera();const near=mode==='orbit'?null:nearest();if(near&&near!==activeStation)chooseStation(near);else if(!near&&mode!=='orbit'&&activeStation){activeStation=null;$('#prompt').innerHTML='<strong>FOB FIELD GUIDE</strong><div>Move closer to a station and press E to inspect</div>'}for(const s of stationObjects){s.beacon.position.y=5.6+Math.sin(now*.002+s.data.pos[0])*.12;s.ring.rotation.z=now*.00025}renderer.render(scene,camera)}
+requestAnimationFrame(animate);
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+$('#status').textContent='FOB SCENE READY · REFERENCE-LED BLOCKOUT · NOT YET A MEASURED 1:1 LAYOUT';
+</script>
+</body></html>
