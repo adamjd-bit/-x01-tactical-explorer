@@ -141,25 +141,26 @@ function buildAreaSetpiece(a,x,z){
  }
 }
 const roomProfiles={
- 'Deep Vault':{w:4.9,d:4.3,entry:['east','south'],tone:0x343b3e},
- 'Supply Depot':{w:3.6,d:3.2,entry:['south','west'],tone:0x46504c},
- 'Pump Station':{w:3.8,d:3.5,entry:['west','south'],tone:0x35464a},
- 'Power Generators':{w:3.8,d:3.5,entry:['west','north'],tone:0x343d40},
- 'T.E.C.H. Lab':{w:4.2,d:3.7,entry:['west','east','south'],tone:0x3c4a4d},
- 'Bio Lab':{w:3.8,d:3.6,entry:['west','north'],tone:0x34463f},
- 'Medical Wing':{w:4.0,d:3.3,entry:['east','south'],tone:0x46504b},
- 'Production Assembly':{w:5.0,d:4.0,entry:['north','east','west'],tone:0x424a49},
- 'Data Center':{w:5.0,d:4.2,entry:['west','south'],tone:0x303c43},
- 'Cargo Bay':{w:4.8,d:4.0,entry:['east','south'],tone:0x454c4d},
- 'Control Room':{w:3.9,d:3.4,entry:['west','south'],tone:0x303b40},
- 'Main Warehouse':{w:5.1,d:4.2,entry:['north','west','east'],tone:0x41494a},
- 'Motor Pool':{w:4.6,d:3.8,entry:['north','west'],tone:0x454b49},
- 'Admin Offices':{w:4.0,d:3.5,entry:['east','south'],tone:0x4a4c47}
+ 'Deep Vault':{w:4.5,d:3.8,entry:['east','south'],tone:0x343b3e},
+ 'Supply Depot':{w:3.2,d:3.1,entry:['south','west','east'],tone:0x46504c},
+ 'Pump Station':{w:3.1,d:3.2,entry:['west','south','east'],tone:0x35464a},
+ 'Power Generators':{w:3.1,d:3.2,entry:['west','north','east','south'],tone:0x343d40},
+ 'T.E.C.H. Lab':{w:3.3,d:3.4,entry:['west','east','south'],tone:0x3c4a4d},
+ 'Bio Lab':{w:3.3,d:3.3,entry:['west','north'],tone:0x34463f},
+ 'Medical Wing':{w:3.8,d:3.3,entry:['north','east'],tone:0x46504b},
+ 'Production Assembly':{w:4.5,d:3.8,entry:['north','east','west'],tone:0x424a49},
+ 'Data Center':{w:4.8,d:4.0,entry:['west','south'],tone:0x303c43},
+ 'Cargo Bay':{w:4.4,d:3.8,entry:['east','south'],tone:0x454c4d},
+ 'Control Room':{w:3.6,d:3.2,entry:['west','south','east'],tone:0x303b40},
+ 'Main Warehouse':{w:4.8,d:4.0,entry:['north','west','east','south'],tone:0x41494a},
+ 'Motor Pool':{w:4.2,d:3.6,entry:['north','west'],tone:0x454b49},
+ 'Admin Offices':{w:3.8,d:3.4,entry:['east','south'],tone:0x4a4c47}
 };
 function areaPosition(a){
  const [x,z]=pos(a.grid);
- if(a.name==='Pump Station')return [x-1.55,z+.15];
- if(a.name==='Power Generators')return [x+1.55,z-.15];
+ if(a.name==='Pump Station')return [x-2.0,z+.15];
+ if(a.name==='Power Generators')return [x+2.0,z-.15];
+ if(a.name==='Control Room'&&floorId==='upper')return [x-1.8,z];
  return [x,z];
 }
 function wallOpening(cx,cz,w,d,side,opening,h=2.72,material=matWall){
@@ -230,7 +231,7 @@ function buildZone(a,i){
   const beam=new THREE.Mesh(new THREE.BoxGeometry(.10,.12,d),ribMat);
   beam.position.set(x-w/2+.9+n*1.7,2.96,z);gridGroup.add(beam);
  }
- const tray=new THREE.Mesh(new THREE.BoxGeometry(w-.6,.10,.18,darkSteel));
+ const tray=new THREE.Mesh(new THREE.BoxGeometry(w-.6,.10,.18),darkSteel);
  tray.position.set(x,2.63,z-d/2+.3);gridGroup.add(tray);
  for(let n=0;n<3;n++){
   const pipe=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,d-.5,8),steel);
@@ -344,7 +345,10 @@ function buildArchitecturalLinks(areas){
  for(const [from,to,via=[]] of links){
   const A=byName[from],B=byName[to];if(!A||!B)continue;
   const ca=areaPosition(A),cb=areaPosition(B);
-  const route=[ca,...via,cb];
+  const first=via.length?via[0]:cb,last=via.length?via[via.length-1]:ca;
+  const edge=(center,next,profile)=>{const dx=next[0]-center[0],dz=next[1]-center[1],m=Math.hypot(dx,dz)||1;return [center[0]+dx/m*(Math.abs(dx/m)>.7?profile.w/2:profile.d/2),center[1]+dz/m*(Math.abs(dz/m)>.7?profile.w/2:profile.d/2)]};
+  const start=edge(ca,first,roomProfiles[from]||{w:3.8,d:3.4}),finish=edge(cb,last,roomProfiles[to]||{w:3.8,d:3.4});
+  const route=[start,...via,finish];
   for(let n=0;n<route.length-1;n++)buildHallSegment(route[n],route[n+1]);
  }
 }
@@ -354,7 +358,7 @@ function buildFloor(){
  document.querySelector('#lower').classList.toggle('active',floorId==='lower');document.querySelector('#upper').classList.toggle('active',floorId==='upper');
  const slab=new THREE.Mesh(new THREE.BoxGeometry(43,.48,43),matFloor);slab.position.y=-.28;slab.receiveShadow=true;gridGroup.add(slab);
  const under=new THREE.Mesh(new THREE.BoxGeometry(43,.28,43),matDark);under.position.y=-.64;gridGroup.add(under);
- for(let k=-20;k<=20;k+=4){const line=new THREE.Mesh(new THREE.BoxGeometry(.035,.012,40),new THREE.MeshBasicMaterial({color:0x354638}));line.position.set(k,-.025,0);detailGroup.add(line);const cross=new THREE.Mesh(new THREE.BoxGeometry(40,.012,.035),new THREE.MeshBasicMaterial({color:0x354638}));cross.position.set(0,-.025,k);detailGroup.add(cross)}
+ // No decorative sector grid is rendered in the physical environment.
  // Perimeter bulkheads and restrained industrial hazard edging
  for(const [x,z,sx,sz] of [[0,-21,43,.45],[0,21,43,.45],[-21,0,.45,43],[21,0,.45,43]]){const w=new THREE.Mesh(new THREE.BoxGeometry(sx,1.25,sz),matWall);w.position.set(x,.34,z);detailGroup.add(w)}
  for(let x=-19;x<=19;x+=4){const tick=new THREE.Mesh(new THREE.BoxGeometry(.09,.03,.7),matAccent);tick.position.set(x,.015,-20.2);detailGroup.add(tick)}
