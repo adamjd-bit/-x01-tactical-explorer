@@ -1,38 +1,41 @@
 # MW4 DMZ — FOB Tactical Explorer
 
-A separate, self-contained browser-based 3D reconstruction project located in `/fob/`. The existing X-01 Tactical Explorer at the repository root is left untouched.
+A separate browser-based 3D reconstruction in `/fob/`. The existing X-01 Tactical Explorer at the repository root is kept separate.
 
 ## Open
 
-After GitHub Pages publishes the latest commit:
-
+GitHub Pages URL (deployment must be checked independently):
 https://adamjd-bit.github.io/-x01-tactical-explorer/fob/
 
-## Current build
+## Current reconstruction
 
-- Procedural 3D woodland encampment based on official FOB overview imagery.
-- First-person, third-person and orbit camera modes.
-- Keyboard movement (WASD / arrow keys), touch movement pad, drag-to-look and orbit zoom.
-- Interactive station directory and station information panels.
-- Physical station set dressing: field huts, tented work areas, workbenches, crates, screens, satellite dishes, antennae, trees, rocks, range targets and a transport-helicopter silhouette.
-- Reference data separated into `data/fob-reference.json`.
+- Procedural 3D woodland encampment with an autumn woodland palette and mountain/rock perimeter.
+- Rough central access track with uneven flagstone and cracked-concrete ground details.
+- Open-sided vehicle maintenance shelter with two tactical vehicle blockouts, based on official environment imagery.
+- Field huts, tents, workstations, storage crates, screens, satellite dishes, solar panels, antennae, field lights and utility props.
+- Firing-range lane with targets arranged at increasing distances.
+- Razor-wire deployment threshold and transport-helicopter silhouette.
+- Thirteen physical FOB station entries, matching the official guide's enumerated station list.
+- Orbit, first-person and third-person camera modes.
+- WASD / arrow movement, drag-to-look, orbit zoom and mobile touch movement controls.
+- Station directory and proximity-based interaction panels.
 
-## Evidence and accuracy
-
-The current scene is a navigable reference-led blockout, not a verified 1:1 measured replica. Official Call of Duty screenshots establish the wooded mountain clearing, field structures, station visual language, wooded firing range and helicopter deployment threshold. Exact site dimensions, station coordinates, orientation and paths are not supplied in the public guide and must be measured from continuous in-game footage or screenshots before the geometry can be called exact.
-
-## Primary references
+## Official reference basis
 
 - [Official Call of Duty FOB Intel Guide](https://www.callofduty.com/blog/2026/10/call-of-duty-modern-warfare-4-dmz-how-to-play-forward-operating-base-guide)
-- [Official COD POD DMZ First Look — FOB discussion at 27:20](https://www.youtube.com/watch?v=qmkmQ1AWPVE)
-- [Official FOB overview image](https://imgs.callofduty.com/content/dam/atvi/callofduty/cod-touchui/blog/body/mw4/dmz-fob/MW4-DMZ-FOB-002.webp)
-- [Official station examples — Operators, Orders, Stash, Bounty Board](https://imgs.callofduty.com/content/dam/atvi/callofduty/cod-touchui/blog/body/mw4/dmz-fob/MW4-DMZ-FOB-004.webp)
-- [Official station examples — Printer, Boss Board, Vendor, Gunsmith](https://imgs.callofduty.com/content/dam/atvi/callofduty/cod-touchui/blog/body/mw4/dmz-fob/MW4-DMZ-FOB-005.webp)
+- [Official COD POD DMZ First Look](https://www.youtube.com/watch?v=qmkmQ1AWPVE)
+- [FOB overview image — MW4-DMZ-FOB-002](https://imgs.callofduty.com/content/dam/atvi/callofduty/cod-touchui/blog/body/mw4/dmz-fob/MW4-DMZ-FOB-002.webp)
+- [FOB field environment — MW4-DMZ-FOB-003](https://imgs.callofduty.com/content/dam/atvi/callofduty/cod-touchui/blog/body/mw4/dmz-fob/MW4-DMZ-FOB-003.webp)
+- [FOB station examples — MW4-DMZ-FOB-004](https://imgs.callofduty.com/content/dam/atvi/callofduty/cod-touchui/blog/body/mw4/dmz-fob/MW4-DMZ-FOB-004.webp)
+
+## Accuracy status
+
+The official sources establish the overall woodland clearing, small field structures, station types, vehicle shelter, firing range and deployment threshold. They do not publish a measured site plan. Therefore, the current scene is a reference-led navigable blockout, not a verified 1:1 replica. Exact dimensions, station positions, paths and prop placement still need to be measured from a continuous in-game walkthrough.
 
 ## Next reconstruction pass
 
-1. Capture a continuous, slow FOB walkthrough from the game, including the entrance, all turns, every station and the firing range.
-2. Extract reference frames and establish a measured top-down site plan.
-3. Replace provisional station positions and dimensions with measured geometry.
-4. Refine individual station props and materials against the official screenshots and in-game captures.
-5. Validate first-person collision, sightlines, touch controls and performance on iPhone Safari.
+1. Capture a continuous slow walkthrough from the FOB entry, covering all paths, turns, stations, vehicle shelter, firing range and deploy threshold.
+2. Extract reference frames and construct a measured top-down site plan.
+3. Replace provisional station coordinates and structure dimensions with measured geometry.
+4. Rebuild each station's specific furniture, screens, racks and equipment against the in-game captures.
+5. Validate collision, sightlines, camera modes, touch controls and performance in iPhone Safari.
