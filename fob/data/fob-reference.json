@@ -1,0 +1,68 @@
+{
+  "project": "MW4 DMZ FOB Tactical Explorer",
+  "version": 1,
+  "status": "reference-led reconstruction blockout; exact in-game measurements and station coordinates remain to be verified from full gameplay capture",
+  "primaryReferences": [
+    {
+      "title": "Call of Duty — DMZ Deep Dive, Part 2: Forward Operating Base Full Intel Guide",
+      "url": "https://www.callofduty.com/blog/2026/10/call-of-duty-modern-warfare-4-dmz-how-to-play-forward-operating-base-guide",
+      "date": "2026-10-09",
+      "use": "Official overview, station list, environmental overview and station reference imagery."
+    },
+    {
+      "title": "Call of Duty — DMZ First Look, COD POD Episode 11 with Infinity Ward",
+      "url": "https://www.youtube.com/watch?v=qmkmQ1AWPVE",
+      "use": "Developer discussion; FOB segment begins at 27:20."
+    },
+    {
+      "title": "Official FOB overview image",
+      "url": "https://imgs.callofduty.com/content/dam/atvi/callofduty/cod-touchui/blog/body/mw4/dmz-fob/MW4-DMZ-FOB-002.webp",
+      "use": "Wooded mountain clearing, central path, small military structures, tents, satellite dishes and overall outdoor character."
+    },
+    {
+      "title": "Official FOB station examples — first image",
+      "url": "https://imgs.callofduty.com/content/dam/atvi/callofduty/cod-touchui/blog/body/mw4/dmz-fob/MW4-DMZ-FOB-004.webp",
+      "use": "Operators, DMZ Orders, Stash/Loadout and Bounty Leaderboard station styling."
+    },
+    {
+      "title": "Official FOB station examples — second image",
+      "url": "https://imgs.callofduty.com/content/dam/atvi/callofduty/cod-touchui/blog/body/mw4/dmz-fob/MW4-DMZ-FOB-005.webp",
+      "use": "3D Printer, Boss Board, Vendor and Gunsmith workstation styling."
+    }
+  ],
+  "environmentEvidence": {
+    "confirmed": [
+      "The FOB is a navigable outdoor encampment in a wooded, mountainous setting.",
+      "The official overview shows a central rough path/clearing, small field structures, tented work areas, rocks, trees and communications equipment.",
+      "The Firing Range is a wooded grove with targets from close range to over 100 metres.",
+      "The Deploy threshold uses razor wire and leads to a heavy-lift military transport helicopter."
+    ],
+    "notYetVerified": [
+      "Exact site dimensions, north direction, station coordinates, structure dimensions and precise walking routes.",
+      "The exact placement and orientation of every station relative to the others.",
+      "Complete continuous first-person walkthrough coverage of the whole FOB."
+    ]
+  },
+  "stations": [
+    {"id":"operators","name":"Operators","availability":"starting"},
+    {"id":"orders","name":"DMZ Orders","availability":"starting"},
+    {"id":"stash","name":"Stash / Loadout","availability":"starting"},
+    {"id":"range","name":"Firing Range","availability":"starting"},
+    {"id":"survival","name":"Survival Kits","availability":"starting"},
+    {"id":"bounty","name":"Bounty Leaderboard","availability":"starting"},
+    {"id":"printer","name":"3D Printer","availability":"level 2"},
+    {"id":"boss","name":"Boss Board","availability":"after second DMZ Order"},
+    {"id":"vendor","name":"Vendor","availability":"level 5"},
+    {"id":"gunsmith","name":"Gunsmith","availability":"level 10"},
+    {"id":"dogtags","name":"Dog Tag Case","availability":"level 20"},
+    {"id":"progression","name":"DMZ Progression","availability":"starting"},
+    {"id":"events","name":"Events","availability":"starting"},
+    {"id":"deploy","name":"Deploy","availability":"starting"}
+  ],
+  "reconstructionPolicy": [
+    "Do not invent exact geometry and present it as verified.",
+    "Keep the scene layout data-driven so verified coordinates can replace provisional positions.",
+    "Use official screenshots for materials, props and visual language; use gameplay capture to verify spatial relationships.",
+    "The first build is a navigable visual blockout, not a claim of a measured 1:1 replica."
+  ]
+}
