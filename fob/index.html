@@ -41,6 +41,9 @@ button.active{background:#9caf73;color:#10150f;border-color:#c3d29e}
 <div id="closePanel"><div class="modal"><div class="meta">FOB STATION INTERFACE</div><h2 id="modalTitle">Station</h2><p id="modalText"></p><button id="dismiss">CLOSE</button></div></div>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+let randomSeed=0x4d573446;
+Math.random=()=>{randomSeed=(randomSeed*1664525+1013904223)>>>0;return randomSeed/4294967296;};
+
 const $=s=>document.querySelector(s),host=$('#scene');
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x82908a);scene.fog=new THREE.FogExp2(0x82908a,.009);
 const camera=new THREE.PerspectiveCamera(66,innerWidth/innerHeight,.1,500);
@@ -51,6 +54,15 @@ const sun=new THREE.DirectionalLight(0xffe5c4,2.3);sun.position.set(-45,70,25);s
 const fill=new THREE.DirectionalLight(0xb2c9d5,.45);fill.position.set(35,25,-45);scene.add(fill);
 const mat=(c,r=.85,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
 const soil=mat(0x49483d),pathmat=mat(0x777363),grassmat=mat(0x354533),grass2=mat(0x46533c),rockmat=mat(0x66665c),concrete=mat(0x74766e),olive=mat(0x454d3b),olive2=mat(0x626b4c),dark=mat(0x1c2421,.7,.35),metal=mat(0x59615e,.42,.72),canvas=mat(0x555c47,.96),canvas2=mat(0x73745d,.96),screenmat=mat(0x071b19,.35,.25),yellow=mat(0xc4a15b,.6,.25);
+function makeSurfaceTexture(base,low,high,repeat=1){
+ const c=document.createElement('canvas');c.width=256;c.height=256;const x=c.getContext('2d');x.fillStyle=base;x.fillRect(0,0,256,256);
+ for(let i=0;i<3400;i++){x.globalAlpha=.08+Math.random()*.22;x.fillStyle=Math.random()>.5?low:high;const w=1+Math.random()*5,h=1+Math.random()*3;x.fillRect(Math.random()*256,Math.random()*256,w,h)}
+ x.globalAlpha=1;const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(repeat,repeat);t.anisotropy=renderer.capabilities.getMaxAnisotropy();return t;
+}
+soil.map=makeSurfaceTexture('#514f43','#292d25','#8b8067',28);soil.needsUpdate=true;
+pathmat.map=makeSurfaceTexture('#777466','#4d4d43','#a19b86',10);pathmat.needsUpdate=true;
+concrete.map=makeSurfaceTexture('#777a72','#555a53','#a3a49a',5);concrete.needsUpdate=true;
+
 const ground=new THREE.Mesh(new THREE.PlaneGeometry(230,230),soil);ground.rotation.x=-Math.PI/2;ground.position.y=-.2;ground.receiveShadow=true;scene.add(ground);
 function box(parent,x,y,z,w,h,d,material,cast=true){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);o.position.set(x,y,z);o.castShadow=cast;o.receiveShadow=true;parent.add(o);return o}
 function cyl(parent,x,y,z,rt,rb,h,material,seg=10){const o=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg),material);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
