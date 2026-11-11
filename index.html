@@ -2,15 +2,46 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#101411"><title>The Veteran Lobby | X01 Tactical Explorer</title>
 <style>
 :root{--bg:#0b100d;--panel:#151d18f2;--green:#a5bd73;--cream:#eee8d6;--muted:#a4aa9a}*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--cream);font:14px system-ui,sans-serif}#view{position:absolute;inset:0}canvas{display:block;touch-action:none}header{position:absolute;top:0;left:0;right:0;padding:13px 17px;background:linear-gradient(180deg,#080c0bea 0%,#0b100d99 70%,transparent);pointer-events:none}.brand{font-weight:800;letter-spacing:.14em;font-size:11px;color:var(--green)}h1{font-size:18px;margin:4px 0;letter-spacing:.04em}.panel{position:absolute;left:13px;top:135px;width:min(290px,calc(100vw - 26px));max-height:calc(100vh - 165px);overflow:auto;background:var(--panel);border:1px solid #82965b99;border-radius:10px;padding:12px;backdrop-filter:blur(12px);box-shadow:0 10px 30px #0008}.panel h2{font-size:10px;letter-spacing:.14em;color:var(--green);margin:0 0 8px}.controls{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}button{background:#303b2c;color:var(--cream);border:1px solid #74865b;border-radius:6px;padding:8px 10px;font-size:11px;font-weight:700}.active{background:#71854e;color:#101410}#zoomControls{position:absolute;z-index:6;right:14px;top:48%;transform:translateY(-50%);display:flex;flex-direction:column;gap:7px}#zoomControls button{width:43px;height:43px;padding:0;font-size:23px;line-height:1;background:#172018ee;border:1px solid #91a66a;border-radius:8px;box-shadow:0 3px 12px #0008}.floorbar{position:absolute;z-index:5;top:75px;left:50%;transform:translateX(-50%);display:flex;gap:8px;padding:6px;background:#111811ee;border:1px solid #71845b;border-radius:10px;box-shadow:0 5px 22px #0009}.floorbar button{min-width:132px;padding:12px 14px;font-size:12px}.floorbar button.active{background:#91a66a;color:#101410;border-color:#c2d29d}.sub{font-size:10px;color:var(--muted);margin:-6px 0 10px;line-height:1.35}.note{font-size:10px;color:var(--muted);line-height:1.4;margin-top:8px}#legend{position:absolute;right:13px;bottom:13px;background:var(--panel);border:1px solid #64704c66;border-radius:8px;padding:9px 11px;font-size:10px;color:var(--muted)}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}#status{position:absolute;left:13px;bottom:13px;color:#c5cbb9;font-size:10px;background:#111711dd;padding:8px 10px;border-radius:6px;max-width:55vw}#pad{display:none;gap:5px;margin-top:8px}#pad button{min-width:38px}@media(max-width:600px){.floorbar{top:69px;width:calc(100% - 26px);justify-content:stretch}.floorbar button{flex:1;min-width:0;padding:13px 5px;font-size:11px}.panel{top:auto;bottom:54px;width:min(225px,calc(100vw - 26px));max-height:48vh}.note{display:none}h1{font-size:15px}#legend{max-width:132px}#status{bottom:10px}}
+
+/* VISUAL OVERHAUL — command-interface treatment */
+:root{--bg:#080d10;--panel:rgba(12,19,22,.92);--green:#b5c98a;--cream:#e9e5d8;--muted:#9aa7a5}
+html,body{background:#080d10;color:var(--cream);font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif}
+header{padding:16px 20px 22px;background:linear-gradient(180deg,rgba(5,9,12,.97),rgba(5,9,12,.68) 68%,transparent);border-bottom:1px solid #b4c88a24}
+.brand{font-size:10px;letter-spacing:.24em;color:#c2d59a}
+h1{font-size:clamp(16px,2.2vw,23px);font-weight:850;letter-spacing:.11em;text-shadow:0 2px 14px #000}
+header:after{content:"BLACK SITE INTELLIGENCE  /  LIVE 3D RECONSTRUCTION";display:block;margin-top:5px;color:#91a09b;font-size:9px;letter-spacing:.16em}
+.panel{top:145px;left:16px;width:min(310px,calc(100vw - 32px));padding:15px;background:linear-gradient(145deg,rgba(18,29,32,.96),rgba(8,14,17,.94));border:1px solid #9db37a66;border-radius:12px;box-shadow:0 16px 48px #000a,inset 0 1px #ffffff0b}
+.panel h2{font-size:9px;letter-spacing:.2em;color:#c1d79a}
+.sub{color:#b6c2b9;font-size:11px;letter-spacing:.04em}
+.controls{gap:7px}
+button{background:linear-gradient(180deg,#35443c,#1c2927);border:1px solid #82966b88;color:#e7e8dc;border-radius:7px;transition:background .18s,border-color .18s,transform .18s}
+button:active{transform:translateY(1px)}
+button.active,.floorbar button.active{background:linear-gradient(180deg,#c2d59a,#879d63);color:#101712;border-color:#d7e6b5;box-shadow:0 0 18px #b5c98a36}
+.floorbar{top:83px;gap:6px;padding:5px;background:rgba(8,15,17,.94);border:1px solid #81966a88;border-radius:10px;backdrop-filter:blur(16px)}
+.floorbar button{min-width:145px;padding:11px 16px;letter-spacing:.1em}
+#zoomControls button{background:rgba(11,19,21,.94);border-color:#91a66a;box-shadow:0 4px 18px #0009}
+#legend{background:rgba(8,15,17,.92);border:1px solid #81966a66;border-radius:10px;backdrop-filter:blur(14px);box-shadow:0 8px 24px #0008}
+#status{background:rgba(8,15,17,.92);border:1px solid #81966a55;border-radius:8px;letter-spacing:.08em;backdrop-filter:blur(12px)}
+.note{color:#aeb8ad}
+@media(max-width:600px){
+ header{padding:12px 14px 18px}header:after{font-size:7px;letter-spacing:.1em}
+ .floorbar{top:77px;width:calc(100% - 28px)}
+ .floorbar button{padding:12px 5px;font-size:10px;letter-spacing:.06em}
+ .panel{left:10px;bottom:62px;width:min(235px,calc(100vw - 20px));padding:11px;max-height:42vh}
+ #legend{right:10px;bottom:10px;padding:8px;font-size:9px}
+ #status{left:10px;bottom:10px;max-width:48vw;font-size:8px;padding:7px}
+ #zoomControls{right:10px}
+}
+
 </style></head><body><div id="view"></div><header><div class="brand">THE VETERAN LOBBY</div><h1>X01 BLACK SITE · TACTICAL EXPLORER</h1></header>
 <nav class="floorbar" aria-label="Choose X01 floor"><button id="lower" class="active">FIRST FLOOR</button><button id="upper">SECOND FLOOR</button></nav><div id="zoomControls" aria-label="Map zoom"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button></div><section class="panel"><div id="floorSub" class="sub">First Floor · verified sector references</div><h2>VIEW MODE</h2><div class="controls"><button id="orbit" class="active">3D CUTAWAY</button><button id="walk">FIRST PERSON</button><button id="reset">RESET VIEW</button></div><div class="note">3D: drag to pan · Shift+drag or right-drag to orbit · pinch to zoom · twist two fingers to rotate · + / − to zoom. First person: WASD/arrows · drag to look · mobile pad below.</div><div id="pad"><button data-move="forward">▲</button><button data-move="left">◀</button><button data-move="back">▼</button><button data-move="right">▶</button></div><div class="note">Room modules, partitions and doorways are illustrative architectural detail, not verified in-game measurements. Named zones and grid references are sourced.</div></section>
 <div id="legend"><div><span class="dot" style="background:#82965b"></span>Area reference</div><div><span class="dot" style="background:#d3ae65"></span>Key room / objective</div><div><span class="dot" style="background:#6f9eb0"></span>Exfil / service</div><div><span class="dot" style="background:#a9b4a1"></span>Stairs</div><div><span class="dot" style="background:#77c5d0"></span>Ascender</div><div><span class="dot" style="background:#9cb8d0"></span>Infil point</div></div><div id="status">LOADING X01 MAP DATA…</div>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-const host=document.querySelector('#view'),scene=new THREE.Scene();scene.background=new THREE.Color(0x101411);
-const camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,500);camera.position.set(26,24,29);
-const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.8));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;host.appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xdde5d1,0x30382d,2));const sun=new THREE.DirectionalLight(0xffffff,2);sun.position.set(15,35,20);sun.castShadow=true;scene.add(sun);
+const host=document.querySelector('#view'),scene=new THREE.Scene();scene.background=new THREE.Color(0x0a1114);scene.fog=new THREE.FogExp2(0x0a1114,.009);
+const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,500);camera.position.set(26,24,29);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.8));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.18;host.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xc8d8d1,0x18201f,1.65));const sun=new THREE.DirectionalLight(0xffffff,2);sun.position.set(15,35,20);sun.castShadow=true;sun.intensity=2.6;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-28;sun.shadow.camera.right=28;sun.shadow.camera.top=28;sun.shadow.camera.bottom=-28;scene.add(sun);const fillLight=new THREE.DirectionalLight(0x8eb7bd,.7);fillLight.position.set(-18,14,-12);scene.add(fillLight);const rimLight=new THREE.PointLight(0x8cae75,26,48,2);rimLight.position.set(0,8,0);scene.add(rimLight);
 const gridGroup=new THREE.Group(),markerGroup=new THREE.Group(),detailGroup=new THREE.Group();scene.add(gridGroup,markerGroup,detailGroup);
 const matFloor=new THREE.MeshStandardMaterial({color:0x171f1a,roughness:.95}),matArea=new THREE.MeshStandardMaterial({color:0x43563e,roughness:.86,metalness:.12}),matArea2=new THREE.MeshStandardMaterial({color:0x303f36,roughness:.86,metalness:.12}),matPin=new THREE.MeshStandardMaterial({color:0xe3b65d,emissive:0x54300a}),matBlue=new THREE.MeshStandardMaterial({color:0x78b6c1,emissive:0x12343b}),matWall=new THREE.MeshStandardMaterial({color:0x667265,metalness:.55,roughness:.65}),matAccent=new THREE.MeshStandardMaterial({color:0x9cae70,emissive:0x18250e}),matDark=new THREE.MeshStandardMaterial({color:0x101713,metalness:.35,roughness:.7});
 const target=new THREE.Vector3(0,0,0);let mode='orbit',floorId='lower',yaw=Math.PI,pitch=0,keys={},moveHeld=null,dragging=false,dragAction='pan',lastX=0,lastY=0,pointers=new Map(),pinchDistance=0;
@@ -69,8 +100,81 @@ function buildZone(a,i){
  for(const dx of [-.9,.72]){const lamp=new THREE.Mesh(new THREE.BoxGeometry(.72,.045,.10),new THREE.MeshBasicMaterial({color:0xb5c88a}));lamp.position.set(x+dx,1.72,z-.34);gridGroup.add(lamp)}
  const consoleBox=new THREE.Mesh(new THREE.BoxGeometry(.55,.52,.38),matDark);consoleBox.position.set(x+.92,.48,z+.28);gridGroup.add(consoleBox);
  const screen=new THREE.Mesh(new THREE.BoxGeometry(.42,.25,.035),new THREE.MeshBasicMaterial({color:0x6f9e91,emissive:0x24483e}));screen.position.set(x+.92,.78,z+.075);gridGroup.add(screen);
- // Overhead cable tray and industrial conduit runs add a grounded military-facility silhouette.\n const tray=addPropBox(2.8,.10,.16,0x252c2c,.75);tray.position.set(x,1.78,z-1.22);gridGroup.add(tray);\n for(let p=0;p<3;p++){const conduit=addPropBox(.055,.055,2.4,0x8a918b,.8);conduit.position.set(x-1.35+p*.12,1.48,z-.25);gridGroup.add(conduit)}\n const s=labelSprite(a.name);s.position.set(x-.05,2.05,z-.28);s.scale.set(4.8,.92,1);gridGroup.add(s);
+ // Overhead cable tray and industrial conduit runs add a grounded military-facility silhouette.\n const tray=addPropBox(2.8,.10,.16,0x252c2c,.75);tray.position.set(x,1.78,z-1.22);gridGroup.add(tray);\n for(let p=0;p<3;p++){const conduit=addPropBox(.055,.055,2.4,0x8a918b,.8);conduit.position.set(x-1.35+p*.12,1.48,z-.25);gridGroup.add(conduit)}\n buildZoneIdentity(a,x,z);\n const s=labelSprite(a.name);s.position.set(x-.05,2.18,z-.28);s.scale.set(4.8,.92,1);gridGroup.add(s);
 }
+
+function addDetailMesh(geo,mat,x,y,z,group=gridGroup){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;group.add(m);return m}
+function addRail(x,z,length,axis='x',color=0xd1a33e){
+ const metal=new THREE.MeshStandardMaterial({color,metalness:.68,roughness:.42});
+ for(const side of [-.42,.42]){const post=addDetailMesh(new THREE.BoxGeometry(.07,.72,.07),metal,x+(axis==='x'?0:side),.55,z+(axis==='x'?side:0));}
+ const bar=addDetailMesh(new THREE.BoxGeometry(axis==='x'?length:.07,.075,axis==='z'?.07:length),metal,x,.91,z);return bar;
+}
+function buildZoneIdentity(a,x,z){
+ const n=a.name.toLowerCase();
+ const steel=new THREE.MeshStandardMaterial({color:0x4c5655,metalness:.78,roughness:.38});
+ const darkSteel=new THREE.MeshStandardMaterial({color:0x202829,metalness:.72,roughness:.48});
+ const amber=new THREE.MeshStandardMaterial({color:0xd19b3e,metalness:.5,roughness:.55});
+ const blue=new THREE.MeshStandardMaterial({color:0x397b83,emissive:0x0c2529,metalness:.35,roughness:.4});
+ const green=new THREE.MeshStandardMaterial({color:0x5b9879,emissive:0x153a2c,metalness:.25});
+ if(n.includes('deep vault')){
+  // Armoured vault portal, concentric locking hub and reinforced door leaves.
+  addDetailMesh(new THREE.BoxGeometry(2.65,1.95,.24),darkSteel,x,1.05,z-1.18);
+  addDetailMesh(new THREE.BoxGeometry(2.35,1.7,.12),steel,x,1.05,z-1.34);
+  const ring=addDetailMesh(new THREE.TorusGeometry(.58,.11,12,48),amber,x,.98,z-1.25);ring.rotation.x=Math.PI/2;
+  const hub=addDetailMesh(new THREE.CylinderGeometry(.25,.25,.16,16),darkSteel,x,.98,z-1.19);hub.rotation.x=Math.PI/2;
+  for(let k=0;k<8;k++){const a0=k*Math.PI/4;addDetailMesh(new THREE.BoxGeometry(.10,.42,.08),amber,x+Math.cos(a0)*.82,1.03+Math.sin(a0)*.62,z-1.12)}
+  for(let i=0;i<3;i++){const rib=addDetailMesh(new THREE.BoxGeometry(.09,1.45,.16),steel,x-1.12+i*1.12,.96,z-.95)}
+  const warning=addDetailMesh(new THREE.BoxGeometry(1.5,.12,.04),amber,x,1.88,z-1.02);
+ }else if(n.includes('bio lab')){
+  // Glass containment vessels, pipework and yellow safety catwalk rails.
+  for(let i=0;i<3;i++){const tank=addDetailMesh(new THREE.CylinderGeometry(.28,.32,1.22,16),blue,x-.95+i*.9,.78,z-.35);const cap=addDetailMesh(new THREE.CylinderGeometry(.33,.33,.09,16),steel,x-.95+i*.9,1.43,z-.35)}
+  addRail(x,z+.72,2.65,'x');addRail(x-1.12,z-.95,1.1,'z');
+  for(let i=0;i<3;i++){const pipe=addDetailMesh(new THREE.CylinderGeometry(.045,.045,2.6,10),amber,x-1.2+i*.22,1.58,z-.9);pipe.rotation.z=Math.PI/2}
+  const hatch=addDetailMesh(new THREE.CylinderGeometry(.52,.52,.07,24),darkSteel,x+.95,.23,z+.3);hatch.rotation.x=0;
+  const hatchRing=addDetailMesh(new THREE.TorusGeometry(.48,.055,8,32),amber,x+.95,.28,z+.3);
+ }else if(n.includes('data center')||n.includes('control room')){
+  // Server cabinets with vented doors, status lights and cold monitor glow.
+  for(let row=0;row<2;row++)for(let i=0;i<3;i++){
+   const sx=x-.95+i*.9,sz=z-.75+row*.92;
+   addDetailMesh(new THREE.BoxGeometry(.62,1.45,.48),darkSteel,sx,.88,sz);
+   addDetailMesh(new THREE.BoxGeometry(.48,1.18,.035),steel,sx,.88,sz+.255);
+   for(let k=0;k<5;k++){addDetailMesh(new THREE.BoxGeometry(.34,.035,.025),darkSteel,sx,.42+k*.18,sz+.28)}
+   for(let k=0;k<3;k++){const led=addDetailMesh(new THREE.SphereGeometry(.035,8,6),k===1?green:blue,sx-.16+k*.16,1.48,sz+.29);led.material=new THREE.MeshBasicMaterial({color:k===1?0x77d6a0:0x66c5d4})}
+  }
+  const monitor=addDetailMesh(new THREE.BoxGeometry(1.1,.62,.08),darkSteel,x,1.48,z+1.12);
+  addDetailMesh(new THREE.BoxGeometry(.94,.44,.025),blue,x,1.49,z+1.17);
+ }else if(n.includes('production assembly')||n.includes('main warehouse')){
+  // Assembly line, overhead gantry and palletised industrial stock.
+  const belt=addDetailMesh(new THREE.BoxGeometry(2.6,.18,.58),darkSteel,x,.42,z+.15);
+  for(let i=0;i<5;i++){const roller=addDetailMesh(new THREE.CylinderGeometry(.09,.09,.68,12),steel,x-1+i*.5,.43,z+.15);roller.rotation.x=Math.PI/2}
+  for(const side of [-1,1]){addDetailMesh(new THREE.BoxGeometry(.08,1.3,.08),amber,x+side*1.42,1.0,z-.78)}
+  addDetailMesh(new THREE.BoxGeometry(2.95,.09,.12),steel,x,1.62,z-.78);
+  for(let i=0;i<3;i++){addDetailMesh(new THREE.BoxGeometry(.58,.48,.48),i===1?amber:steel,x-.82+i*.82,.42,z-.72)}
+ }else if(n.includes('medical')){
+  // Clinical cabinets, treatment bed and cool task lighting.
+  for(let i=0;i<3;i++){addDetailMesh(new THREE.BoxGeometry(.42,.9,.32),steel,x-.95+i*.75,.68,z-.9);addDetailMesh(new THREE.BoxGeometry(.31,.08,.035),blue,x-.95+i*.75,.96,z-.72)}
+  addDetailMesh(new THREE.BoxGeometry(1.35,.16,.62),darkSteel,x+.25,.68,z+.42);
+  addDetailMesh(new THREE.BoxGeometry(1.18,.12,.54),new THREE.MeshStandardMaterial({color:0xb7b9ae,roughness:.8}),x+.25,.80,z+.42);
+  addDetailMesh(new THREE.BoxGeometry(.10,.55,.10),steel,x-.28,.4,z+.42);
+  addDetailMesh(new THREE.BoxGeometry(.10,.55,.10),steel,x+.78,.4,z+.42);
+ }else if(n.includes('power generator')||n.includes('pump station')){
+  // Heavy rotating machinery, pipe headers and maintenance panels.
+  for(let i=0;i<3;i++){
+   const cx=x-.85+i*.82;
+   const drum=addDetailMesh(new THREE.CylinderGeometry(.32,.32,.78,18),steel,cx,.72,z-.45);drum.rotation.z=Math.PI/2;
+   addDetailMesh(new THREE.CylinderGeometry(.34,.34,.08,18),amber,cx-.42,.72,z-.45).rotation.z=Math.PI/2;
+   addDetailMesh(new THREE.BoxGeometry(.42,.46,.4),darkSteel,cx,.36,z+.52);
+  }
+  for(let i=0;i<2;i++){const pipe=addDetailMesh(new THREE.CylinderGeometry(.065,.065,2.5,10),amber,x-.72+i*.38,1.55,z-.8);pipe.rotation.z=Math.PI/2}
+ }else if(n.includes('cargo bay')||n.includes('motor pool')){
+  for(let i=0;i<3;i++){const crate=addDetailMesh(new THREE.BoxGeometry(.68,.62,.62),i===1?amber:steel,x-.78+i*.78,.47,z-.35);for(let k=0;k<3;k++)addDetailMesh(new THREE.BoxGeometry(.04,.55,.04),darkSteel,x-.99+i*.78+k*.2,.47,z-.35)}
+  addRail(x,z+.85,2.5,'x');
+ }else{
+  // General utility cabinets and wall-mounted electrical panels.
+  for(let i=0;i<2;i++){addDetailMesh(new THREE.BoxGeometry(.48,.78,.26),steel,x-.72+i*1.35,.62,z-.95);addDetailMesh(new THREE.BoxGeometry(.28,.18,.035),blue,x-.72+i*1.35,.83,z-.79)}
+ }
+}
+
 function buildAdjacentCorridors(areas){
  for(let i=0;i<areas.length;i++)for(let j=i+1;j<areas.length;j++){
   const [x1,z1]=pos(areas[i].grid),[x2,z2]=pos(areas[j].grid);
