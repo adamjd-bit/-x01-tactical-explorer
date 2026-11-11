@@ -69,28 +69,48 @@ function buildStationObject(f,x,z){
  }
 }
 function buildZone(a,i){
- const [x,z]=pos(a.grid),floorMat=new THREE.MeshStandardMaterial({color:i%2?0x424746:0x4b4e4b,roughness:.94});
- // Irregular facility footprint: main room plus offset service annex, rather than a single coloured sector tile.
+ const [x,z]=pos(a.grid),floorMat=new THREE.MeshStandardMaterial({color:i%2?0x424746:0x4b4e4b,roughness:.94,metalness:.18});
+ // Industrial metal deck: inset plates, seams and restrained service markings.
  const main=new THREE.Mesh(new THREE.BoxGeometry(3.45,.12,2.55),floorMat);main.position.set(x-.12,.12,z-.34);main.receiveShadow=true;gridGroup.add(main);
- const annex=new THREE.Mesh(new THREE.BoxGeometry(1.72,.12,1.22),floorMat);annex.position.set(x+.88,.12,z+1.28);gridGroup.add(annex);
+ const annex=new THREE.Mesh(new THREE.BoxGeometry(1.72,.12,1.22),floorMat);annex.position.set(x+.88,.12,z+1.28);annex.receiveShadow=true;gridGroup.add(annex);
+ const plateMat=new THREE.MeshStandardMaterial({color:0x626a67,metalness:.58,roughness:.72});
+ const seamMat=new THREE.MeshBasicMaterial({color:0x252d2b});
+ for(let px=-1;px<=1;px++){
+  const plate=new THREE.Mesh(new THREE.BoxGeometry(1.02,.018,2.28),plateMat);plate.position.set(x-.12+px*1.08,.188,z-.34);gridGroup.add(plate);
+  const seam=new THREE.Mesh(new THREE.BoxGeometry(.025,.022,2.3),seamMat);seam.position.set(x-.12+px*1.08+.52,.20,z-.34);gridGroup.add(seam);
+ }
+ for(let pz=0;pz<2;pz++){const seam=new THREE.Mesh(new THREE.BoxGeometry(3.32,.022,.025),seamMat);seam.position.set(x-.12,.20,z-1.0+pz*1.28);gridGroup.add(seam)}
+ const grateMat=new THREE.MeshStandardMaterial({color:0x252d2b,metalness:.72,roughness:.58});
+ const grate=new THREE.Mesh(new THREE.BoxGeometry(.42,.025,1.85),grateMat);grate.position.set(x-1.22,.205,z+.04);gridGroup.add(grate);
+ for(let n=0;n<9;n++){const bar=new THREE.Mesh(new THREE.BoxGeometry(.44,.028,.035),plateMat);bar.position.set(x-1.22,.225,z-.78+n*.205);gridGroup.add(bar)}
+ const annexPlate=new THREE.Mesh(new THREE.BoxGeometry(1.52,.018,1.02),plateMat);annexPlate.position.set(x+.88,.188,z+1.28);gridGroup.add(annexPlate);
  const trim=new THREE.Mesh(new THREE.BoxGeometry(3.55,.045,2.65),matDark);trim.position.set(x-.12,.035,z-.34);gridGroup.add(trim);
- // Perimeter walls have deliberate openings for doorways.
- addWall(x-1.82,z-.34,.16,2.55,1.25,new THREE.MeshStandardMaterial({color:0x737b78,metalness:.35,roughness:.85}));addWall(x+1.58,z-.34,.16,2.55,1.25,new THREE.MeshStandardMaterial({color:0x737b78,metalness:.35,roughness:.85}));
- addWall(x-.12,z-1.62,3.5,.16,1.25,new THREE.MeshStandardMaterial({color:0x737b78,metalness:.35,roughness:.85}));
+ // Transparent overhead glazing lets the room layout remain visible from above.
+ const glassMat=new THREE.MeshStandardMaterial({color:0x91a9a5,metalness:.42,roughness:.28,transparent:true,opacity:.17,depthWrite:false,side:THREE.DoubleSide});
+ const roof=new THREE.Mesh(new THREE.BoxGeometry(3.48,.075,2.58),glassMat);roof.position.set(x-.12,2.48,z-.34);gridGroup.add(roof);
+ const annexRoof=new THREE.Mesh(new THREE.BoxGeometry(1.75,.075,1.25),glassMat);annexRoof.position.set(x+.88,2.48,z+1.28);gridGroup.add(annexRoof);
+ const beamMat=new THREE.MeshStandardMaterial({color:0x65716d,metalness:.72,roughness:.48});
+ for(const side of [-1,1]){const beam=new THREE.Mesh(new THREE.BoxGeometry(.10,.12,2.72),beamMat);beam.position.set(x-.12+side*1.72,2.48,z-.34);gridGroup.add(beam)}
+ for(const side of [-1,1]){const beam=new THREE.Mesh(new THREE.BoxGeometry(3.55,.12,.10),beamMat);beam.position.set(x-.12,2.48,z-.34+side*1.31);gridGroup.add(beam)}
+ const cross=new THREE.Mesh(new THREE.BoxGeometry(.07,.10,2.5),beamMat);cross.position.set(x-.12,2.48,z-.34);gridGroup.add(cross);
+ // Perimeter bulkheads retain deliberate openings for doorways.
+ const wallMat=new THREE.MeshStandardMaterial({color:0x737b78,metalness:.42,roughness:.78});
+ addWall(x-1.82,z-.34,.16,2.55,1.25,wallMat);addWall(x+1.58,z-.34,.16,2.55,1.25,wallMat);
+ addWall(x-.12,z-1.62,3.5,.16,1.25,wallMat);
  addWall(x-1.02,z+.93,1.72,.12);addWall(x+1.08,z+.93,.96,.12);
  addDoor(x+.38,z+.93,'x');
- // Interior partitions create smaller rooms and service alcoves.
- addWall(x-.28,z-.52,.10,1.28,.82);
- addWall(x+.68,z-.96,1.15,.10,.82);
+ // Interior partitions and service alcoves.
+ addWall(x-.28,z-.52,.10,1.28,.82);addWall(x+.68,z-.96,1.15,.10,.82);
  addDoor(x-.28,z+.12,'z');addDoor(x+.65,z-.96,'x');
- // Door threshold and floor striping.
  const threshold=new THREE.Mesh(new THREE.BoxGeometry(1.05,.035,.22),matAccent);threshold.position.set(x+.38,.205,z+.91);gridGroup.add(threshold);
  for(let n=0;n<4;n++){const stripe=new THREE.Mesh(new THREE.BoxGeometry(.10,.025,.32),matPin);stripe.position.set(x+1.22+n*.16,.205,z-.34);detailGroup.add(stripe)}
- // Ceiling-height industrial light bars and low equipment consoles.
+ // Ceiling fixtures, cable tray and wall-mounted equipment.
  for(const dx of [-.9,.72]){const lamp=new THREE.Mesh(new THREE.BoxGeometry(.72,.045,.10),new THREE.MeshBasicMaterial({color:0xb5c88a}));lamp.position.set(x+dx,1.72,z-.34);gridGroup.add(lamp)}
  const consoleBox=new THREE.Mesh(new THREE.BoxGeometry(.55,.52,.38),matDark);consoleBox.position.set(x+.92,.48,z+.28);gridGroup.add(consoleBox);
  const screen=new THREE.Mesh(new THREE.BoxGeometry(.42,.25,.035),new THREE.MeshBasicMaterial({color:0x6f9e91,emissive:0x24483e}));screen.position.set(x+.92,.78,z+.075);gridGroup.add(screen);
- // Overhead cable tray and industrial conduit runs add a grounded military-facility silhouette.\n const tray=addPropBox(2.8,.10,.16,0x252c2c,.75);tray.position.set(x,1.78,z-1.22);gridGroup.add(tray);\n for(let p=0;p<3;p++){const conduit=addPropBox(.055,.055,2.4,0x8a918b,.8);conduit.position.set(x-1.35+p*.12,1.48,z-.25);gridGroup.add(conduit)}\n const s=labelSprite(a.name);s.position.set(x-.05,2.05,z-.28);s.scale.set(4.8,.92,1);gridGroup.add(s);
+ const tray=addPropBox(2.8,.10,.16,0x252c2c,.75);tray.position.set(x,1.78,z-1.22);gridGroup.add(tray);
+ for(let p=0;p<3;p++){const conduit=addPropBox(.055,.055,2.4,0x8a918b,.8);conduit.position.set(x-1.35+p*.12,1.48,z-.25);gridGroup.add(conduit)}
+ const s=labelSprite(a.name);s.position.set(x-.05,2.05,z-.28);s.scale.set(4.8,.92,1);gridGroup.add(s);
 }
 function buildAdjacentCorridors(areas){
  for(let i=0;i<areas.length;i++)for(let j=i+1;j<areas.length;j++){
