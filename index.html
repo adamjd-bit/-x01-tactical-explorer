@@ -140,101 +140,212 @@ function buildAreaSetpiece(a,x,z){
   for(const px of [-.65,.25])box(.55,.48,.52,amber,px,.48,.72);
  }
 }
-function buildZone(a,i){
- const [x,z]=pos(a.grid),floorMat=new THREE.MeshStandardMaterial({color:i%2?0x343b3e:0x3d4447,roughness:.82,metalness:.38});
- // Industrial metal deck: inset plates, seams and restrained service markings.
- const main=new THREE.Mesh(new THREE.BoxGeometry(3.45,.12,2.55),floorMat);main.position.set(x-.12,.12,z-.34);main.receiveShadow=true;gridGroup.add(main);
- const annex=new THREE.Mesh(new THREE.BoxGeometry(1.72,.12,1.22),floorMat);annex.position.set(x+.88,.12,z+1.28);annex.receiveShadow=true;gridGroup.add(annex);
- const plateMat=new THREE.MeshStandardMaterial({color:0x697276,metalness:.78,roughness:.52});
- const seamMat=new THREE.MeshBasicMaterial({color:0x252d2b});
- for(let px=-1;px<=1;px++){
-  const plate=new THREE.Mesh(new THREE.BoxGeometry(1.02,.018,2.28),plateMat);plate.position.set(x-.12+px*1.08,.188,z-.34);gridGroup.add(plate);
-  const seam=new THREE.Mesh(new THREE.BoxGeometry(.025,.022,2.3),seamMat);seam.position.set(x-.12+px*1.08+.52,.20,z-.34);gridGroup.add(seam);
- }
- for(let pz=0;pz<2;pz++){const seam=new THREE.Mesh(new THREE.BoxGeometry(3.32,.022,.025),seamMat);seam.position.set(x-.12,.20,z-1.0+pz*1.28);gridGroup.add(seam)}
- const grateMat=new THREE.MeshStandardMaterial({color:0x252d2b,metalness:.72,roughness:.58});
- const grate=new THREE.Mesh(new THREE.BoxGeometry(.42,.025,1.85),grateMat);grate.position.set(x-1.22,.205,z+.04);gridGroup.add(grate);
- for(let n=0;n<9;n++){const bar=new THREE.Mesh(new THREE.BoxGeometry(.44,.028,.035),plateMat);bar.position.set(x-1.22,.225,z-.78+n*.205);gridGroup.add(bar)}
- const annexPlate=new THREE.Mesh(new THREE.BoxGeometry(1.52,.018,1.02),plateMat);annexPlate.position.set(x+.88,.188,z+1.28);gridGroup.add(annexPlate);
- const trim=new THREE.Mesh(new THREE.BoxGeometry(3.55,.045,2.65),matDark);trim.position.set(x-.12,.035,z-.34);gridGroup.add(trim);
- // Transparent overhead glazing lets the room layout remain visible from above.
- const glassMat=new THREE.MeshStandardMaterial({color:0x91a9a5,metalness:.42,roughness:.28,transparent:true,opacity:.10,depthWrite:false,side:THREE.DoubleSide});
- const roof=new THREE.Mesh(new THREE.BoxGeometry(3.48,.075,2.58),glassMat);roof.position.set(x-.12,2.48,z-.34);gridGroup.add(roof);
- const annexRoof=new THREE.Mesh(new THREE.BoxGeometry(1.75,.075,1.25),glassMat);annexRoof.position.set(x+.88,2.48,z+1.28);gridGroup.add(annexRoof);
- const beamMat=new THREE.MeshStandardMaterial({color:0x65716d,metalness:.72,roughness:.48});
- for(const side of [-1,1]){const beam=new THREE.Mesh(new THREE.BoxGeometry(.10,.12,2.72),beamMat);beam.position.set(x-.12+side*1.72,2.48,z-.34);gridGroup.add(beam)}
- for(const side of [-1,1]){const beam=new THREE.Mesh(new THREE.BoxGeometry(3.55,.12,.10),beamMat);beam.position.set(x-.12,2.48,z-.34+side*1.31);gridGroup.add(beam)}
- const cross=new THREE.Mesh(new THREE.BoxGeometry(.07,.10,2.5),beamMat);cross.position.set(x-.12,2.48,z-.34);gridGroup.add(cross);
- // Perimeter bulkheads retain deliberate openings for doorways.
- const wallMat=new THREE.MeshStandardMaterial({color:0xb7c0c1,metalness:.32,roughness:.86,map:wallTexture});
- addWall(x-1.82,z-.34,.16,2.55,1.25,wallMat);addWall(x+1.58,z-.34,.16,2.55,1.25,wallMat);
- addWall(x-.12,z-1.62,3.5,.16,1.25,wallMat);
- addWall(x-1.02,z+.93,1.72,.12);addWall(x+1.08,z+.93,.96,.12);
- addDoor(x+.38,z+.93,'x');
- // Interior partitions and service alcoves.
- addWall(x-.28,z-.52,.10,1.28,.82);addWall(x+.68,z-.96,1.15,.10,.82);
- addDoor(x-.28,z+.12,'z');addDoor(x+.65,z-.96,'x');
- const threshold=new THREE.Mesh(new THREE.BoxGeometry(1.05,.035,.22),matAccent);threshold.position.set(x+.38,.205,z+.91);gridGroup.add(threshold);
- for(let n=0;n<4;n++){const stripe=new THREE.Mesh(new THREE.BoxGeometry(.10,.025,.32),matPin);stripe.position.set(x+1.22+n*.16,.205,z-.34);detailGroup.add(stripe)}
- // Ceiling fixtures, cable tray and wall-mounted equipment.
- for(const dx of [-.9,.72]){const lamp=new THREE.Mesh(new THREE.BoxGeometry(.72,.045,.10),new THREE.MeshBasicMaterial({color:0xb5c88a}));lamp.position.set(x+dx,1.72,z-.34);gridGroup.add(lamp)}
- const consoleBox=new THREE.Mesh(new THREE.BoxGeometry(.55,.52,.38),matDark);consoleBox.position.set(x+.92,.48,z+.28);gridGroup.add(consoleBox);
- const screen=new THREE.Mesh(new THREE.BoxGeometry(.42,.25,.035),new THREE.MeshBasicMaterial({color:0x6f9e91,emissive:0x24483e}));screen.position.set(x+.92,.78,z+.075);gridGroup.add(screen);
- const tray=addPropBox(2.8,.10,.16,0x252c2c,.75);tray.position.set(x,1.78,z-1.22);gridGroup.add(tray);
- for(let p=0;p<3;p++){const conduit=addPropBox(.055,.055,2.4,0x8a918b,.8);conduit.position.set(x-1.35+p*.12,1.48,z-.25);gridGroup.add(conduit)}
- const s=labelSprite(a.name);s.position.set(x-.05,2.05,z-.28);s.scale.set(4.8,.92,1);gridGroup.add(s);
- buildAreaSetpiece(a,x,z);
+const roomProfiles={
+ 'Deep Vault':{w:4.9,d:4.3,entry:['east','south'],tone:0x343b3e},
+ 'Supply Depot':{w:3.6,d:3.2,entry:['south','west'],tone:0x46504c},
+ 'Pump Station':{w:3.8,d:3.5,entry:['west','south'],tone:0x35464a},
+ 'Power Generators':{w:3.8,d:3.5,entry:['west','north'],tone:0x343d40},
+ 'T.E.C.H. Lab':{w:4.2,d:3.7,entry:['west','east','south'],tone:0x3c4a4d},
+ 'Bio Lab':{w:3.8,d:3.6,entry:['west','north'],tone:0x34463f},
+ 'Medical Wing':{w:4.0,d:3.3,entry:['east','south'],tone:0x46504b},
+ 'Production Assembly':{w:5.0,d:4.0,entry:['north','east','west'],tone:0x424a49},
+ 'Data Center':{w:5.0,d:4.2,entry:['west','south'],tone:0x303c43},
+ 'Cargo Bay':{w:4.8,d:4.0,entry:['east','south'],tone:0x454c4d},
+ 'Control Room':{w:3.9,d:3.4,entry:['west','south'],tone:0x303b40},
+ 'Main Warehouse':{w:5.1,d:4.2,entry:['north','west','east'],tone:0x41494a},
+ 'Motor Pool':{w:4.6,d:3.8,entry:['north','west'],tone:0x454b49},
+ 'Admin Offices':{w:4.0,d:3.5,entry:['east','south'],tone:0x4a4c47}
+};
+function areaPosition(a){
+ const [x,z]=pos(a.grid);
+ if(a.name==='Pump Station')return [x-1.55,z+.15];
+ if(a.name==='Power Generators')return [x+1.55,z-.15];
+ return [x,z];
 }
-function buildAdjacentCorridors(areas){
- const deckMat=new THREE.MeshStandardMaterial({color:0x596367,metalness:.52,roughness:.68});
- const plateMat=new THREE.MeshStandardMaterial({color:0x899397,metalness:.58,roughness:.58});
- const darkMat=new THREE.MeshStandardMaterial({color:0x171e21,metalness:.52,roughness:.74});
- const wallMat=new THREE.MeshStandardMaterial({color:0x596469,metalness:.42,roughness:.78});
- const edgeMat=new THREE.MeshStandardMaterial({color:0x9a7138,metalness:.62,roughness:.58});
- const glowMat=new THREE.MeshStandardMaterial({color:0x9db5b4,emissive:0x496b70,emissiveIntensity:1.5});
- for(let i=0;i<areas.length;i++)for(let j=i+1;j<areas.length;j++){
-  const [x1,z1]=pos(areas[i].grid),[x2,z2]=pos(areas[j].grid);
-  if(Math.abs(x1-x2)+Math.abs(z1-z2)>4.01)continue;
-  const horizontal=Math.abs(x1-x2)>0,midX=(x1+x2)/2,midZ=(z1+z2)/2;
-  const length=4.0,width=1.42;
-  const hall=new THREE.Mesh(new THREE.BoxGeometry(horizontal?length:.10,.16,horizontal?width:length),deckMat);
-  hall.position.set(midX,.12,midZ);hall.receiveShadow=true;gridGroup.add(hall);
-  // Hallway deck plates continue the same industrial finish as the rooms.
-  for(let n=0;n<4;n++){
-   const plate=new THREE.Mesh(new THREE.BoxGeometry(horizontal?.94:.96,.025,horizontal?1.30:.94),plateMat);
-   plate.position.set(midX+(horizontal?-1.5+n:0),.215,midZ+(horizontal?0:-1.5+n));gridGroup.add(plate);
-   const seam=new THREE.Mesh(new THREE.BoxGeometry(horizontal?.025:.98,.028,horizontal?1.30:.025),darkMat);
-   seam.position.set(midX+(horizontal?-1.02+n:0),.226,midZ+(horizontal?0:-1.02+n));gridGroup.add(seam);
+function wallOpening(cx,cz,w,d,side,opening,h=2.72,material=matWall){
+ const half=opening/2;
+ if(side==='north'||side==='south'){
+  const z=cz+(side==='north'?-d/2:d/2),seg=(w-opening)/2;
+  addWall(cx-(opening/2+seg/2),z,seg,.18,h,material);
+  addWall(cx+(opening/2+seg/2),z,seg,.18,h,material);
+  addDoor(cx,z, 'x');
+ }else{
+  const x=cx+(side==='west'?-w/2:w/2),seg=(d-opening)/2;
+  addWall(x,cz-(opening/2+seg/2),.18,seg,h,material);
+  addWall(x,cz+(opening/2+seg/2),.18,seg,h,material);
+  addDoor(x,cz,'z');
+ }
+}
+function buildZone(a,i){
+ const [x,z]=areaPosition(a),p=roomProfiles[a.name]||{w:3.8,d:3.4,entry:['south'],tone:0x3d4647};
+ const {w,d}=p;
+ const concrete=new THREE.MeshStandardMaterial({color:p.tone,roughness:.94,metalness:.12});
+ const steel=new THREE.MeshStandardMaterial({color:0x657176,roughness:.78,metalness:.52});
+ const darkSteel=new THREE.MeshStandardMaterial({color:0x222a2d,roughness:.82,metalness:.48});
+ const floor=new THREE.Mesh(new THREE.BoxGeometry(w,.18,d),concrete);
+ floor.position.set(x,.02,z);floor.receiveShadow=true;gridGroup.add(floor);
+ // Modular deck panels, recessed service grates and perimeter kick plates.
+ const plate=new THREE.MeshStandardMaterial({color:0x697478,roughness:.7,metalness:.48});
+ const seam=new THREE.MeshBasicMaterial({color:0x20282b});
+ for(let n=0;n<Math.floor(w/1.2);n++){
+  const px=x-w/2+.62+n*1.2;
+  const panel=new THREE.Mesh(new THREE.BoxGeometry(1.12,.025,d-.36),plate);
+  panel.position.set(px,.125,z);gridGroup.add(panel);
+  const line=new THREE.Mesh(new THREE.BoxGeometry(.025,.028,d-.38),seam);
+  line.position.set(px+.57,.14,z);gridGroup.add(line);
+ }
+ const grate=new THREE.Mesh(new THREE.BoxGeometry(.34,.03,d-1.0),darkSteel);
+ grate.position.set(x-w/2+.34,.15,z);gridGroup.add(grate);
+ for(let n=0;n<Math.floor((d-1)/.24);n++){
+  const bar=new THREE.Mesh(new THREE.BoxGeometry(.38,.035,.035),plate);
+  bar.position.set(x-w/2+.34,.17,z-(d-1)/2+.12+n*.24);gridGroup.add(bar);
+ }
+ const trim=new THREE.Mesh(new THREE.BoxGeometry(w+.12,.08,d+.12),darkSteel);
+ trim.position.set(x,.075,z);gridGroup.add(trim);
+ // Full-height concrete/steel bulkheads with actual door openings.
+ const bulkhead=new THREE.MeshStandardMaterial({color:0x667176,roughness:.86,metalness:.3,map:wallTexture});
+ for(const side of ['north','south','east','west']){
+  if(p.entry.includes(side))wallOpening(x,z,w,d,side,1.35,2.72,bulkhead);
+  else if(side==='north'||side==='south')addWall(x,z+(side==='north'?-d/2:d/2),w,.18,2.72,bulkhead);
+  else addWall(x+(side==='west'?-w/2:w/2),z,.18,d,2.72,bulkhead);
+ }
+ // Wall ribs, lower impact rails, upper cable trays and structural roof beams.
+ const ribMat=new THREE.MeshStandardMaterial({color:0x7b8587,metalness:.62,roughness:.62});
+ for(const side of [-1,1]){
+  for(let n=0;n<Math.floor(d/1.05);n++){
+   const rib=new THREE.Mesh(new THREE.BoxGeometry(.11,2.45,.12),ribMat);
+   rib.position.set(x+side*(w/2-.13),1.42,z-d/2+.55+n*1.05);gridGroup.add(rib);
   }
-  // Recessed grated service strip, hazard edge paint and wall kick plates.
-  const grate=new THREE.Mesh(new THREE.BoxGeometry(horizontal?3.5:.22,.025,horizontal?.22:3.5),darkMat);grate.position.set(midX,.225,midZ);gridGroup.add(grate);
-  for(let n=0;n<13;n++){
-   const bar=new THREE.Mesh(new THREE.BoxGeometry(horizontal?.045:.22,.035,horizontal?.22:.045),plateMat);
-   bar.position.set(midX+(horizontal?-1.62+n*.27:0),.25,midZ+(horizontal?0:-1.62+n*.27));gridGroup.add(bar);
-  }
-  for(const side of [-1,1]){
-   const rail=new THREE.Mesh(new THREE.BoxGeometry(horizontal?4:.12,.82,horizontal?.12:4),wallMat);
-   rail.position.set(midX+(horizontal?0:side*.77),.60,midZ+(horizontal?side*.77:0));rail.castShadow=true;gridGroup.add(rail);
-   const kick=new THREE.Mesh(new THREE.BoxGeometry(horizontal?4:.15,.14,horizontal?.12:4),edgeMat);
-   kick.position.set(midX+(horizontal?0:side*.69),.30,midZ+(horizontal?side*.69:0));gridGroup.add(kick);
-   for(let n=0;n<7;n++){
-    const rib=new THREE.Mesh(new THREE.BoxGeometry(horizontal?.055:.12,.72,horizontal?.12:.055),plateMat);
-    rib.position.set(midX+(horizontal?-1.72+n*.57:side*.77),.66,midZ+(horizontal?side*.77:-1.72+n*.57));gridGroup.add(rib);
+  const kick=new THREE.Mesh(new THREE.BoxGeometry(.08,.22,d-.25),darkSteel);
+  kick.position.set(x+side*(w/2-.20),.34,z);gridGroup.add(kick);
+ }
+ const roofMat=new THREE.MeshStandardMaterial({color:0x9ba8a8,metalness:.25,roughness:.55,transparent:true,opacity:.045,depthWrite:false,side:THREE.DoubleSide});
+ const roof=new THREE.Mesh(new THREE.BoxGeometry(w, .07,d),roofMat);
+ roof.position.set(x,3.02,z);gridGroup.add(roof);
+ for(const side of [-1,1]){
+  const beam=new THREE.Mesh(new THREE.BoxGeometry(.13,.16,d+.12),ribMat);
+  beam.position.set(x+side*(w/2-.1),2.96,z);gridGroup.add(beam);
+ }
+ for(let n=0;n<Math.floor(w/1.7);n++){
+  const beam=new THREE.Mesh(new THREE.BoxGeometry(.10,.12,d),ribMat);
+  beam.position.set(x-w/2+.9+n*1.7,2.96,z);gridGroup.add(beam);
+ }
+ const tray=new THREE.Mesh(new THREE.BoxGeometry(w-.6,.10,.18,darkSteel));
+ tray.position.set(x,2.63,z-d/2+.3);gridGroup.add(tray);
+ for(let n=0;n<3;n++){
+  const pipe=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,d-.5,8),steel);
+  pipe.rotation.x=Math.PI/2;pipe.position.set(x-w/2+.35+n*.13,2.48,z);gridGroup.add(pipe);
+ }
+ // Practical overhead fixtures and local pools of light.
+ for(const dx of [-w*.25,w*.25]){
+  const fixture=new THREE.Mesh(new THREE.BoxGeometry(.9,.07,.22),new THREE.MeshBasicMaterial({color:0xc5d4c5}));
+  fixture.position.set(x+dx,2.55,z);gridGroup.add(fixture);
+  const lamp=new THREE.PointLight(0xc0d6c7,.42,7,2);lamp.position.set(x+dx,2.35,z);gridGroup.add(lamp);
+ }
+ // Room-specific partitions create distinct floorplans instead of repeated empty boxes.
+ if(a.name==='Data Center'){
+  for(const px of [-1.55,-.55,.45,1.45]){
+   const partition=new THREE.Mesh(new THREE.BoxGeometry(.12,2.25,1.35),darkSteel);
+   partition.position.set(x+px,1.25,z-.35);gridGroup.add(partition);
+   for(let n=0;n<4;n++){
+    const shelf=new THREE.Mesh(new THREE.BoxGeometry(.52,.055,1.18),steel);
+    shelf.position.set(x+px, .48+n*.43,z-.35);gridGroup.add(shelf);
    }
   }
-  // Overhead service tray, paired conduits and cold industrial ceiling lights.
-  const tray=new THREE.Mesh(new THREE.BoxGeometry(horizontal?4:.12,.09,horizontal?.16:4),darkMat);tray.position.set(midX,2.18,midZ);gridGroup.add(tray);
-  for(const side of [-1,1]){
-   const pipe=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,4,8),new THREE.MeshStandardMaterial({color:0x78858a,metalness:.82,roughness:.4}));
-   pipe.rotation.z=horizontal?Math.PI/2:0;pipe.position.set(midX+(horizontal?0:side*.32),2.04,midZ+(horizontal?side*.32:0));gridGroup.add(pipe);
+ }else if(a.name==='Production Assembly'){
+  const line=new THREE.Mesh(new THREE.BoxGeometry(w-1.0,.22,.82),darkSteel);line.position.set(x,.43,z-.25);gridGroup.add(line);
+  for(let n=0;n<10;n++){
+   const roller=new THREE.Mesh(new THREE.CylinderGeometry(.09,.09,.86,12),steel);
+   roller.rotation.x=Math.PI/2;roller.position.set(x-w/2+.65+n*.43,.58,z-.25);gridGroup.add(roller);
   }
-  const lamp=new THREE.Mesh(new THREE.BoxGeometry(horizontal?1.05:.16,.045,horizontal?.18:1.05),glowMat);lamp.position.set(midX,2.02,midZ);gridGroup.add(lamp);
-  const point=new THREE.PointLight(0x8fb5bd,.65,5,2);point.position.set(midX,1.9,midZ);gridGroup.add(point);
-  // Short hazard bars at each threshold make the corridor transitions legible.
-  for(let n=0;n<5;n++){
-   const stripe=new THREE.Mesh(new THREE.BoxGeometry(horizontal?.13:.38,.025,horizontal?.38:.13),edgeMat);
-   stripe.position.set(midX+(horizontal?-0.35+n*.17:0),.24,midZ+(horizontal?0:-.35+n*.17));gridGroup.add(stripe);
+  for(const px of [-1.8,1.8]){
+   const post=new THREE.Mesh(new THREE.BoxGeometry(.16,2.1,.16),new THREE.MeshStandardMaterial({color:0xb18a4c,metalness:.55}));
+   post.position.set(x+px,1.18,z+.9);gridGroup.add(post);
   }
+ }else if(a.name==='Deep Vault'){
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(1.18,.16,14,56),steel);
+  ring.position.set(x,1.35,z-d/2+.65);gridGroup.add(ring);
+  const inner=new THREE.Mesh(new THREE.CircleGeometry(1.0,56),darkSteel);
+  inner.position.set(x,1.35,z-d/2+.66);gridGroup.add(inner);
+  for(let n=0;n<16;n++){
+   const t=n*Math.PI/8,bolt=new THREE.Mesh(new THREE.CylinderGeometry(.055,.055,.08,8),new THREE.MeshStandardMaterial({color:0xb58c4f,metalness:.6}));
+   bolt.rotation.x=Math.PI/2;bolt.position.set(x+Math.cos(t)*1.18,1.35+Math.sin(t)*1.18,z-d/2+.56);gridGroup.add(bolt);
+  }
+ }else if(a.name==='Bio Lab'||a.name==='T.E.C.H. Lab'){
+  for(const px of [-1.0,1.0]){
+   const tank=new THREE.Mesh(new THREE.CylinderGeometry(.34,.34,1.75,18),new THREE.MeshStandardMaterial({color:0x537a79,transparent:true,opacity:.42,metalness:.3,roughness:.2}));
+   tank.position.set(x+px,1.15,z-.45);gridGroup.add(tank);
+   const cap=new THREE.Mesh(new THREE.CylinderGeometry(.4,.4,.12,18),steel);cap.position.set(x+px,2.05,z-.45);gridGroup.add(cap);
+  }
+ }else if(a.name==='Pump Station'||a.name==='Power Generators'){
+  for(const px of [-.9,.9]){
+   const machine=new THREE.Mesh(new THREE.BoxGeometry(1.05,1.3,1.0),darkSteel);machine.position.set(x+px,.85,z);gridGroup.add(machine);
+   for(let n=0;n<8;n++){
+    const vent=new THREE.Mesh(new THREE.BoxGeometry(.78,.045,.06),steel);vent.position.set(x+px,.45+n*.13,z+.53);gridGroup.add(vent);
+   }
+  }
+ }else if(a.name==='Cargo Bay'||a.name==='Main Warehouse'){
+  for(const [px,pz] of [[-1.3,-.9],[.35,-.9],[-.5,.8],[1.2,.8]]){
+   const crate=new THREE.Mesh(new THREE.BoxGeometry(1.15,1.25,.95),darkSteel);crate.position.set(x+px,.75,z+pz);gridGroup.add(crate);
+   for(let n=0;n<3;n++){
+    const rib=new THREE.Mesh(new THREE.BoxGeometry(1.18,.045,.98),steel);rib.position.set(x+px,.28+n*.4,z+pz);gridGroup.add(rib);
+   }
+  }
+ }else if(a.name==='Control Room'||a.name==='Admin Offices'){
+  for(let n=0;n<3;n++){
+   const desk=new THREE.Mesh(new THREE.BoxGeometry(.9,.16,.55),darkSteel);desk.position.set(x-.95+n*.95,.65,z-.65);gridGroup.add(desk);
+   const monitor=new THREE.Mesh(new THREE.BoxGeometry(.52,.38,.055),new THREE.MeshBasicMaterial({color:n===1?0x7fc1b2:0x7199a5}));
+   monitor.position.set(x-.95+n*.95,.95,z-.87);gridGroup.add(monitor);
+  }
+ }
+ const nameTag=labelSprite(a.name);nameTag.position.set(x,3.25,z);nameTag.scale.set(Math.min(5.0,w+1.0),.72,1);gridGroup.add(nameTag);
+ buildAreaSetpiece(a,x,z);
+}
+function buildHallSegment(a,b,width=1.5){
+ const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz);
+ if(len<.2)return;
+ const horizontal=Math.abs(dx)>=Math.abs(dz),midX=(a[0]+b[0])/2,midZ=(a[1]+b[1])/2;
+ const deck=new THREE.Mesh(new THREE.BoxGeometry(horizontal?len:width,.16,horizontal?width:len),new THREE.MeshStandardMaterial({color:0x505b60,metalness:.45,roughness:.78}));
+ deck.position.set(midX,.10,midZ);deck.receiveShadow=true;gridGroup.add(deck);
+ const plate=new THREE.MeshStandardMaterial({color:0x7a8588,metalness:.55,roughness:.62});
+ for(let n=0;n<Math.max(2,Math.floor(len/.72));n++){
+  const t=(n+.5)/Math.max(2,Math.floor(len/.72));
+  const px=a[0]+dx*t,pz=a[1]+dz*t;
+  const panel=new THREE.Mesh(new THREE.BoxGeometry(horizontal?.62:width-.18,.025,horizontal?width-.18:.62),plate);
+  panel.position.set(px,.20,pz);gridGroup.add(panel);
+ }
+ const wallMat=new THREE.MeshStandardMaterial({color:0x58656a,metalness:.35,roughness:.82});
+ for(const side of [-1,1]){
+  const offset=side*width/2;
+  const wx=horizontal?midX:midX+offset,wz=horizontal?midZ+offset:midZ;
+  const wall=new THREE.Mesh(new THREE.BoxGeometry(horizontal?len: .16,2.65,horizontal?.16:len),wallMat);
+  wall.position.set(wx,1.43,wz);wall.castShadow=true;wall.receiveShadow=true;gridGroup.add(wall);
+  const kick=new THREE.Mesh(new THREE.BoxGeometry(horizontal?len:.2,.20,horizontal?.2:len),new THREE.MeshStandardMaterial({color:0x9b7845,metalness:.55,roughness:.62}));
+  kick.position.set(wx,.34,wz);gridGroup.add(kick);
+ }
+ const service=new THREE.Mesh(new THREE.BoxGeometry(horizontal?len:.14,.12,horizontal?.14:len),new THREE.MeshStandardMaterial({color:0x242d31,metalness:.55,roughness:.72}));
+ service.position.set(midX,2.68,midZ);gridGroup.add(service);
+ const light=new THREE.Mesh(new THREE.BoxGeometry(horizontal?Math.min(1.5,len):.18,.055,horizontal?.18:Math.min(1.5,len)),new THREE.MeshBasicMaterial({color:0xc4d7d3}));
+ light.position.set(midX,2.45,midZ);gridGroup.add(light);
+ const point=new THREE.PointLight(0xa8c7c8,.28,6,2);point.position.set(midX,2.25,midZ);gridGroup.add(point);
+}
+function buildArchitecturalLinks(areas){
+ const byName=Object.fromEntries(areas.map(a=>[a.name,a]));
+ const links=floorId==='lower'?[
+  ['Deep Vault','Medical Wing'],['Medical Wing','T.E.C.H. Lab'],['T.E.C.H. Lab','Bio Lab'],
+  ['Bio Lab','Pump Station',[[6,-2]]],['Pump Station','Power Generators'],
+  ['Power Generators','Supply Depot',[[8,-10]]],['T.E.C.H. Lab','Production Assembly'],
+  ['Production Assembly','Data Center']
+ ]:[
+  ['Cargo Bay','Control Room',[[6,-10]]],['Control Room','Power Generators'],
+  ['Control Room','Main Warehouse',[[6,2]]],['Main Warehouse','Admin Offices',[[-6,2],[-6,-2]]],
+  ['Main Warehouse','Motor Pool',[[-2,6]]]
+ ];
+ for(const [from,to,via=[]] of links){
+  const A=byName[from],B=byName[to];if(!A||!B)continue;
+  const ca=areaPosition(A),cb=areaPosition(B);
+  const route=[ca,...via,cb];
+  for(let n=0;n<route.length-1;n++)buildHallSegment(route[n],route[n+1]);
  }
 }
 function buildFloor(){
@@ -250,7 +361,7 @@ function buildFloor(){
  // Coordinate grid intentionally removed from the rendered environment; this is an enclosed facility, not a green tactical grid.
  cols.forEach((letter,i)=>{const x=i*cell-offset,tag=labelSprite(letter,'#b7c99a');tag.position.set(x,.28,-21.2);tag.scale.set(.9,.55,1);detailGroup.add(tag)});
  for(let row=0;row<10;row++){const z=(row-4.5)*cell,tag=labelSprite(String(row),'#b7c99a');tag.position.set(-21.2,.28,z);tag.scale.set(.9,.55,1);detailGroup.add(tag)}
- buildAdjacentCorridors(floor.areas);floor.areas.forEach((a,i)=>buildZone(a,i));
+ buildArchitecturalLinks(floor.areas);floor.areas.forEach((a,i)=>buildZone(a,i));
  data.markers.filter(m=>m.floor===floorId).forEach(m=>{const [x,z]=pos(m.grid),isKey=m.type==='key-room';const base=new THREE.Mesh(new THREE.CylinderGeometry(.38,.48,.22,6),isKey?matPin:matBlue);base.position.set(x,.62,z);base.castShadow=true;markerGroup.add(base);const ring=new THREE.Mesh(new THREE.TorusGeometry(.58,.045,8,28),new THREE.MeshBasicMaterial({color:isKey?0xe3b65d:0x78b6c1}));ring.rotation.x=Math.PI/2;ring.position.set(x,.76,z);markerGroup.add(ring);const s=labelSprite(m.name,isKey?'#f1d49a':'#b9dce1');s.position.set(x,2.05,z);s.scale.set(5.4,1.2,1);markerGroup.add(s)});
  (data.features||[]).filter(f=>f.floors.includes(floorId)).forEach(f=>{const [x,z]=pos(f.grid);if(f.type==='station')buildStationObject(f,x,z);let color=0x8fb6a0,geo=new THREE.OctahedronGeometry(.34,.0),y=1.02;
  if(f.type==='stairs'){color=0xa9b4a1;geo=new THREE.BoxGeometry(.65,.16,.65);y=.78}
