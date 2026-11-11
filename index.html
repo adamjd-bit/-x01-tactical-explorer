@@ -21,15 +21,41 @@ function clear(g){while(g.children.length){const o=g.children.pop();o.traverse?.
 function labelSprite(text,color='#eee8d6'){const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');x.fillStyle='rgba(10,14,10,.78)';x.fillRect(4,4,504,120);x.strokeStyle='#82965b';x.lineWidth=3;x.strokeRect(4,4,504,120);x.fillStyle=color;x.font='bold 31px system-ui';x.textAlign='center';x.fillText(text.slice(0,27),256,76);const t=new THREE.CanvasTexture(c),s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthTest:false}));s.scale.set(5.6,1.4,1);return s}
 function addWall(x,z,w,d,h=1.05,material=matWall){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);o.position.set(x,.18+h/2,z);o.castShadow=true;o.receiveShadow=true;gridGroup.add(o);return o}
 function addDoor(x,z,axis='x'){const frameMat=matAccent;for(const side of [-.48,.48]){const p=new THREE.Mesh(new THREE.BoxGeometry(.12,.92,.12),frameMat);p.position.set(x+(axis==='x'?side:0),.66,z+(axis==='z'?side:0));gridGroup.add(p)}const lintel=new THREE.Mesh(new THREE.BoxGeometry(axis==='x'?1.08:.12,.12,axis==='z'?1.08:.12),matWall);lintel.position.set(x,1.18,z);gridGroup.add(lintel)}
+function addPropBox(w,h,d,color,metalness=.35){return new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color,metalness,roughness:.62}))}
+function buildStationObject(f,x,z){
+ if(f.name==='3D Printer'){
+  // Enclosed industrial fabrication cabinet: frame, tinted access door, build chamber, gantry and control panel.
+  const base=addPropBox(1.18,.16,.82,0x242a2b,.7);base.position.set(x,.30,z);gridGroup.add(base);
+  const cabinet=addPropBox(1.05,1.32,.72,0x3a4242,.72);cabinet.position.set(x,.98,z);gridGroup.add(cabinet);
+  const cavity=addPropBox(.76,.88,.035,0x111a1b,.35);cavity.position.set(x,.98,z+.38);gridGroup.add(cavity);
+  const glass=addPropBox(.68,.78,.025,0x315052,.45);glass.material.transparent=true;glass.material.opacity=.58;glass.position.set(x,.99,z+.405);gridGroup.add(glass);
+  const bed=addPropBox(.52,.055,.43,0x9ba6a0,.75);bed.position.set(x,.70,z+.19);gridGroup.add(bed);
+  const rail=addPropBox(.62,.055,.055,0xa8b1a9,.8);rail.position.set(x,.1+1.40,z+.16);gridGroup.add(rail);
+  const head=addPropBox(.16,.18,.16,0xd1a34e,.55);head.position.set(x+.08,1.29,z+.12);gridGroup.add(head);
+  const panel=addPropBox(.24,.36,.08,0x171d1d,.65);panel.position.set(x+.48,.98,z+.40);gridGroup.add(panel);
+  const display=addPropBox(.17,.14,.025,0x68b6a0,.25);display.position.set(x+.48,1.04,z+.45);gridGroup.add(display);
+  const warning=addPropBox(.18,.10,.025,0xd3a64e,.25);warning.position.set(x-.36,.48,z+.425);gridGroup.add(warning);
+  const top=addPropBox(1.18,.10,.82,0x59615d,.8);top.position.set(x,1.70,z);gridGroup.add(top);
+  const tag=labelSprite('X01 FABRICATION UNIT','#d7d4c5');tag.position.set(x,2.05,z+.55);tag.scale.set(2.8,.52,1);gridGroup.add(tag);
+ }else if(f.name==='Keycard Encoder'){
+  const base=addPropBox(.82,.12,.66,0x252c2d,.7);base.position.set(x,.27,z);gridGroup.add(base);
+  const kiosk=addPropBox(.68,1.12,.48,0x777f7b,.72);kiosk.position.set(x,.88,z);gridGroup.add(kiosk);
+  const face=addPropBox(.48,.38,.035,0x202b2c,.35);face.position.set(x,.99,z+.255);gridGroup.add(face);
+  const screen=addPropBox(.38,.23,.025,0x6fae9b,.2);screen.position.set(x,.99,z+.28);gridGroup.add(screen);
+  const slot=addPropBox(.22,.045,.035,0x111717,.7);slot.position.set(x,.57,z+.26);gridGroup.add(slot);
+  const led=new THREE.Mesh(new THREE.SphereGeometry(.045,10,8),new THREE.MeshBasicMaterial({color:0x8ad2a0}));led.position.set(x+.22,1.36,z+.26);gridGroup.add(led);
+  const tag=labelSprite('KEYCARD ENCODER','#d7d4c5');tag.position.set(x,1.75,z+.4);tag.scale.set(2.5,.48,1);gridGroup.add(tag);
+ }
+}
 function buildZone(a,i){
- const [x,z]=pos(a.grid),floorMat=new THREE.MeshStandardMaterial({color:i%2?0x343d38:0x3c4540,roughness:.94});
+ const [x,z]=pos(a.grid),floorMat=new THREE.MeshStandardMaterial({color:i%2?0x424746:0x4b4e4b,roughness:.94});
  // Irregular facility footprint: main room plus offset service annex, rather than a single coloured sector tile.
  const main=new THREE.Mesh(new THREE.BoxGeometry(3.45,.12,2.55),floorMat);main.position.set(x-.12,.12,z-.34);main.receiveShadow=true;gridGroup.add(main);
  const annex=new THREE.Mesh(new THREE.BoxGeometry(1.72,.12,1.22),floorMat);annex.position.set(x+.88,.12,z+1.28);gridGroup.add(annex);
  const trim=new THREE.Mesh(new THREE.BoxGeometry(3.55,.045,2.65),matDark);trim.position.set(x-.12,.035,z-.34);gridGroup.add(trim);
  // Perimeter walls have deliberate openings for doorways.
- addWall(x-1.82,z-.34,.12,2.55);addWall(x+1.58,z-.34,.12,2.55);
- addWall(x-.12,z-1.62,3.5,.12);
+ addWall(x-1.82,z-.34,.16,2.55,1.25,new THREE.MeshStandardMaterial({color:0x737b78,metalness:.35,roughness:.85}));addWall(x+1.58,z-.34,.16,2.55,1.25,new THREE.MeshStandardMaterial({color:0x737b78,metalness:.35,roughness:.85}));
+ addWall(x-.12,z-1.62,3.5,.16,1.25,new THREE.MeshStandardMaterial({color:0x737b78,metalness:.35,roughness:.85}));
  addWall(x-1.02,z+.93,1.72,.12);addWall(x+1.08,z+.93,.96,.12);
  addDoor(x+.38,z+.93,'x');
  // Interior partitions create smaller rooms and service alcoves.
@@ -43,7 +69,7 @@ function buildZone(a,i){
  for(const dx of [-.9,.72]){const lamp=new THREE.Mesh(new THREE.BoxGeometry(.72,.045,.10),new THREE.MeshBasicMaterial({color:0xb5c88a}));lamp.position.set(x+dx,1.72,z-.34);gridGroup.add(lamp)}
  const consoleBox=new THREE.Mesh(new THREE.BoxGeometry(.55,.52,.38),matDark);consoleBox.position.set(x+.92,.48,z+.28);gridGroup.add(consoleBox);
  const screen=new THREE.Mesh(new THREE.BoxGeometry(.42,.25,.035),new THREE.MeshBasicMaterial({color:0x6f9e91,emissive:0x24483e}));screen.position.set(x+.92,.78,z+.075);gridGroup.add(screen);
- const s=labelSprite(a.name);s.position.set(x-.05,2.05,z-.28);s.scale.set(4.8,.92,1);gridGroup.add(s);
+ // Overhead cable tray and industrial conduit runs add a grounded military-facility silhouette.\n const tray=addPropBox(2.8,.10,.16,0x252c2c,.75);tray.position.set(x,1.78,z-1.22);gridGroup.add(tray);\n for(let p=0;p<3;p++){const conduit=addPropBox(.055,.055,2.4,0x8a918b,.8);conduit.position.set(x-1.35+p*.12,1.48,z-.25);gridGroup.add(conduit)}\n const s=labelSprite(a.name);s.position.set(x-.05,2.05,z-.28);s.scale.set(4.8,.92,1);gridGroup.add(s);
 }
 function buildAdjacentCorridors(areas){
  for(let i=0;i<areas.length;i++)for(let j=i+1;j<areas.length;j++){
@@ -73,7 +99,7 @@ function buildFloor(){
  for(let row=0;row<10;row++){const z=(row-4.5)*cell,tag=labelSprite(String(row),'#b7c99a');tag.position.set(-21.2,.28,z);tag.scale.set(.9,.55,1);detailGroup.add(tag)}
  buildAdjacentCorridors(floor.areas);floor.areas.forEach((a,i)=>buildZone(a,i));
  data.markers.filter(m=>m.floor===floorId).forEach(m=>{const [x,z]=pos(m.grid),isKey=m.type==='key-room';const base=new THREE.Mesh(new THREE.CylinderGeometry(.38,.48,.22,6),isKey?matPin:matBlue);base.position.set(x,.62,z);base.castShadow=true;markerGroup.add(base);const ring=new THREE.Mesh(new THREE.TorusGeometry(.58,.045,8,28),new THREE.MeshBasicMaterial({color:isKey?0xe3b65d:0x78b6c1}));ring.rotation.x=Math.PI/2;ring.position.set(x,.76,z);markerGroup.add(ring);const s=labelSprite(m.name,isKey?'#f1d49a':'#b9dce1');s.position.set(x,2.05,z);s.scale.set(5.4,1.2,1);markerGroup.add(s)});
- (data.features||[]).filter(f=>f.floors.includes(floorId)).forEach(f=>{const [x,z]=pos(f.grid);let color=0x8fb6a0,geo=new THREE.OctahedronGeometry(.34,.0),y=1.02;
+ (data.features||[]).filter(f=>f.floors.includes(floorId)).forEach(f=>{const [x,z]=pos(f.grid);if(f.type==='station')buildStationObject(f,x,z);let color=0x8fb6a0,geo=new THREE.OctahedronGeometry(.34,.0),y=1.02;
  if(f.type==='stairs'){color=0xa9b4a1;geo=new THREE.BoxGeometry(.65,.16,.65);y=.78}
  if(f.type==='ascender'){color=0x77c5d0;geo=new THREE.CylinderGeometry(.09,.09,1.25,8);y=1.12}
  if(f.type==='exfil'){color=0x74b6ce;geo=new THREE.CylinderGeometry(.42,.42,.22,12);y=.82}
