@@ -1,13 +1,19 @@
 {
   "project": "The Veteran Lobby — X01 Tactical Explorer",
-  "schemaVersion": 2,
-  "dataStatus": "Key-room sector references transcribed from DMZHUB; not a measured architectural floorplan.",
+  "schemaVersion": 3,
+  "dataStatus": "Area grid references cross-checked against DMZ Codex; key-room sector references follow the user-supplied DMZHUB source. This is a sector map, not a measured architectural floorplan.",
   "sources": [
     {
       "name": "DMZHUB X01 Black Site Interactive Map",
       "url": "https://dmzhub.gg/maps/x01-black-site",
       "checked": "2026-11-12",
-      "notes": "Primary source for floor names and key-room grid sectors. The map's live layer also contains dynamic markers; only explicitly listed key-room sectors are plotted here."
+      "notes": "Primary reference for the key-room list, floor assignment and key-room sector references."
+    },
+    {
+      "name": "DMZ Codex X01 Black Site Map",
+      "url": "https://dmzcodex.com/map/x01-black-site/",
+      "checked": "2026-11-12",
+      "notes": "Cross-reference for named facility areas and their grid sectors, stairs, ascenders and other map layers."
     }
   ],
   "grid": {
@@ -40,14 +46,76 @@
     {
       "id": "lower",
       "name": "First Floor",
-      "subtitle": "First Floor · Deep Vault and underground facility sectors",
-      "areas": []
+      "subtitle": "First Floor · Data Center / Deep Vault level",
+      "areas": [
+        {
+          "name": "Deep Vault",
+          "grid": "C2"
+        },
+        {
+          "name": "Supply Depot",
+          "grid": "F2"
+        },
+        {
+          "name": "Pump Station",
+          "grid": "G3"
+        },
+        {
+          "name": "Power Generators",
+          "grid": "H3"
+        },
+        {
+          "name": "T.E.C.H. Lab",
+          "grid": "E4"
+        },
+        {
+          "name": "Bio Lab",
+          "grid": "F4"
+        },
+        {
+          "name": "Medical Wing",
+          "grid": "C4"
+        },
+        {
+          "name": "Production Assembly",
+          "grid": "F5"
+        },
+        {
+          "name": "Data Center",
+          "grid": "H5"
+        }
+      ]
     },
     {
       "id": "upper",
       "name": "Second Floor",
-      "subtitle": "Second Floor · Admin and upper facility sectors",
-      "areas": []
+      "subtitle": "Second Floor · Cargo Bay / Main Warehouse level",
+      "areas": [
+        {
+          "name": "Cargo Bay",
+          "grid": "F2"
+        },
+        {
+          "name": "Control Room",
+          "grid": "G3"
+        },
+        {
+          "name": "Power Generators",
+          "grid": "H3"
+        },
+        {
+          "name": "Admin Offices",
+          "grid": "D5"
+        },
+        {
+          "name": "Main Warehouse",
+          "grid": "F4"
+        },
+        {
+          "name": "Motor Pool",
+          "grid": "F7"
+        }
+      ]
     }
   ],
   "markers": [
@@ -135,8 +203,8 @@
   ],
   "limitations": [
     "Grid references identify sectors, not exact positions within a sector.",
-    "The source lists multiple key locations in sector B1; pins can overlap at sector scale.",
+    "Some key-room sectors in DMZHUB differ from other community map references; key-room markers intentionally follow the user-supplied DMZHUB source.",
     "Room outlines, corridors, doors, stairs, elevations and exact marker positions are not inferred from grid references.",
-    "Dynamic exits, spawns, loot and enemy locations are not plotted in this verified key-room layer."
+    "Dynamic exits, spawns, loot, weapon lockers, ascenders and enemy locations are not yet plotted in this verified layer."
   ]
 }
