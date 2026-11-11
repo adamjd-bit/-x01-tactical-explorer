@@ -1,87 +1,142 @@
 {
   "project": "The Veteran Lobby — X01 Tactical Explorer",
-  "schemaVersion": 1,
-  "dataStatus": "community-reported grid references; not a measured floorplan",
+  "schemaVersion": 2,
+  "dataStatus": "Key-room sector references transcribed from DMZHUB; not a measured architectural floorplan.",
   "sources": [
     {
-      "name": "DMZ Codex X01 Black Site map",
-      "url": "https://dmzcodex.com/map/x01-black-site/",
-      "checked": "2026-11-11",
-      "notes": "Grid references and marker categories. Some stacked/overlapping pins share grid cells."
-    },
-    {
-      "name": "COD Central MW4 DMZ map guide",
-      "url": "https://codcentral.net/blog/mw4-dmz-map/",
-      "checked": "2026-11-11",
-      "notes": "Floor area grouping and floor naming."
+      "name": "DMZHUB X01 Black Site Interactive Map",
+      "url": "https://dmzhub.gg/maps/x01-black-site",
+      "checked": "2026-11-12",
+      "notes": "Primary source for floor names and key-room grid sectors. The map's live layer also contains dynamic markers; only explicitly listed key-room sectors are plotted here."
     }
   ],
   "grid": {
-    "columns": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
-    "rows": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    "columns": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "G",
+      "H",
+      "I",
+      "J"
+    ],
+    "rows": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
   },
   "floors": [
     {
       "id": "lower",
-      "name": "Lower Floor",
-      "subtitle": "Data Center / Production Assembly level",
-      "areas": [
-        {"name": "Deep Vault", "grid": "C2"},
-        {"name": "Supply Depot", "grid": "F2"},
-        {"name": "Pump Station", "grid": "G3"},
-        {"name": "Power Generators", "grid": "H3"},
-        {"name": "T.E.C.H. Lab", "grid": "E4"},
-        {"name": "Bio Lab", "grid": "F4"},
-        {"name": "Medical Wing", "grid": "C4"},
-        {"name": "Production Assembly", "grid": "F5"},
-        {"name": "Data Center", "grid": "H5"}
-      ]
+      "name": "First Floor",
+      "subtitle": "First Floor · Deep Vault and underground facility sectors",
+      "areas": []
     },
     {
       "id": "upper",
-      "name": "Upper Floor",
-      "subtitle": "Main Warehouse / Admin level",
-      "areas": [
-        {"name": "Cargo Bay", "grid": "F2"},
-        {"name": "Control Room", "grid": "G3"},
-        {"name": "Power Generators", "grid": "H3"},
-        {"name": "Admin Offices", "grid": "D5"},
-        {"name": "Main Warehouse", "grid": "F4"},
-        {"name": "Motor Pool", "grid": "F7"}
-      ]
+      "name": "Second Floor",
+      "subtitle": "Second Floor · Admin and upper facility sectors",
+      "areas": []
     }
   ],
   "markers": [
-    {"name": "Deep Vault Room 301", "grid": "C2", "floor": "lower", "type": "key-room", "rarity": "Legendary", "notes": "Deep Vault 301 key; source map places it in the Deep Vault."},
-    {"name": "Small Test Chamber", "grid": "E4", "floor": "lower", "type": "key-room", "rarity": "Epic", "notes": "Located in the T.E.C.H. Lab."},
-    {"name": "Superintendent's Office", "grid": "E4", "floor": "lower", "type": "key-room", "rarity": "Access card", "notes": "Source map associates it with the elevated Main Warehouse platform; floor/grid placement should be rechecked in-game."},
-    {"name": "Executive Room", "grid": "C5", "floor": "upper", "type": "key-room", "rarity": "Legendary", "notes": "Reported near the statue in Admin Offices; source grid placement needs in-game confirmation."},
-    {"name": "Audit Room", "grid": "G5", "floor": "upper", "type": "key-room", "rarity": "Access card", "notes": "Reported in Main Warehouse."},
-    {"name": "Maintenance Room", "grid": "E5", "floor": "lower", "type": "key-room", "rarity": "Access card", "notes": "Reported in Production Assembly."},
-    {"name": "Lt. Chol-Min's Stash Room", "grid": "E7", "floor": "upper", "type": "key-room", "rarity": "Special", "notes": "Reported on the upper catwalk of Motor Pool."},
-    {"name": "Deep Vault Room 406", "grid": "D2", "floor": "lower", "type": "key-room", "rarity": "Legendary", "notes": "Source map marker."},
-    {"name": "Deep Vault Room 106", "grid": "D2", "floor": "lower", "type": "key-room", "rarity": "Reported", "notes": "Source map marker."},
-    {"name": "Emergency Exfil", "grid": "C4", "floor": "lower", "type": "emergency-exfil", "notes": "Requires Staff Emergency Exfil Keycard according to guide sources."},
-    {"name": "Emergency Exfil", "grid": "E2", "floor": "lower", "type": "emergency-exfil", "notes": "Second reported shaft marker; verify exact floor and position in-game."},
-    {"name": "Exit", "grid": "E4", "floor": "lower", "type": "exfil", "notes": "Dynamic exit marker; availability may change."},
-    {"name": "Exit", "grid": "G5", "floor": "upper", "type": "exfil", "notes": "Dynamic exit marker; availability may change."},
-    {"name": "Exit", "grid": "F8", "floor": "upper", "type": "exfil", "notes": "Dynamic exit marker; availability may change."},
-    {"name": "Exit", "grid": "I3", "floor": "upper", "type": "exfil", "notes": "Additional exit marker in source map."},
-    {"name": "3D Printer", "grid": "E5", "floor": "lower", "type": "service", "notes": "Reported in Production Assembly."},
-    {"name": "Keycard Encoder", "grid": "F2", "floor": "lower", "type": "service", "notes": "Supply Depot encoder marker."},
-    {"name": "Keycard Encoder", "grid": "I5", "floor": "lower", "type": "service", "notes": "Second encoder marker; confirm exact floor in-game."},
-    {"name": "Bounty Terminal", "grid": "E5", "floor": "lower", "type": "service", "notes": "Source map marker."},
-    {"name": "Ammo & Armor Cache", "grid": "C2", "floor": "lower", "type": "loot"},
-    {"name": "Ammo & Armor Cache", "grid": "C5", "floor": "upper", "type": "loot"},
-    {"name": "Ammo & Armor Cache", "grid": "F5", "floor": "upper", "type": "loot"},
-    {"name": "Ammo & Armor Cache", "grid": "F4", "floor": "lower", "type": "loot"},
-    {"name": "Ammo & Armor Cache", "grid": "H3", "floor": "lower", "type": "loot"},
-    {"name": "Ammo & Armor Cache", "grid": "H6", "floor": "upper", "type": "loot"}
+    {
+      "name": "Deep Vault Room 301",
+      "grid": "B1",
+      "floor": "lower",
+      "type": "key-room",
+      "source": "DMZHUB",
+      "notes": "Key room sector B1 · First Floor"
+    },
+    {
+      "name": "X01 Vault DRC Locker Key",
+      "grid": "B1",
+      "floor": "lower",
+      "type": "key-room",
+      "source": "DMZHUB",
+      "notes": "Key location sector B1 · First Floor"
+    },
+    {
+      "name": "Deep Vault 406",
+      "grid": "C1",
+      "floor": "lower",
+      "type": "key-room",
+      "source": "DMZHUB",
+      "notes": "Key room sector C1 · First Floor"
+    },
+    {
+      "name": "Deep Vault 106",
+      "grid": "C2",
+      "floor": "lower",
+      "type": "key-room",
+      "source": "DMZHUB",
+      "notes": "Key room sector C2 · First Floor"
+    },
+    {
+      "name": "Small Test Chamber",
+      "grid": "E4",
+      "floor": "lower",
+      "type": "key-room",
+      "source": "DMZHUB",
+      "notes": "Key room sector E4 · First Floor"
+    },
+    {
+      "name": "Maintenance Room",
+      "grid": "E5",
+      "floor": "lower",
+      "type": "key-room",
+      "source": "DMZHUB",
+      "notes": "Key room sector E5 · First Floor"
+    },
+    {
+      "name": "Executive Room",
+      "grid": "C4",
+      "floor": "upper",
+      "type": "key-room",
+      "rarity": "Legendary",
+      "source": "DMZHUB",
+      "notes": "Key room sector C4 · Second Floor"
+    },
+    {
+      "name": "Superintendent's Office",
+      "grid": "E3",
+      "floor": "upper",
+      "type": "key-room",
+      "source": "DMZHUB",
+      "notes": "Key room sector E3 · Second Floor"
+    },
+    {
+      "name": "Audit Room",
+      "grid": "G4",
+      "floor": "upper",
+      "type": "key-room",
+      "source": "DMZHUB",
+      "notes": "Key room sector G4 · Second Floor"
+    },
+    {
+      "name": "Lt. Chol-Min's Stash Room",
+      "grid": "E7",
+      "floor": "upper",
+      "type": "key-room",
+      "source": "DMZHUB",
+      "notes": "Key room sector E7 · Second Floor"
+    }
   ],
   "limitations": [
-    "Grid references identify map sectors, not precise coordinates inside a sector.",
-    "A sector can contain multiple rooms, doors, loot markers or overlapping pins.",
-    "Dynamic exits, boss patrols and loot contents can change between deployments.",
-    "The current 3D room geometry remains an illustrative blockout until verified in-game screenshots or measured floorplan geometry are available."
+    "Grid references identify sectors, not exact positions within a sector.",
+    "The source lists multiple key locations in sector B1; pins can overlap at sector scale.",
+    "Room outlines, corridors, doors, stairs, elevations and exact marker positions are not inferred from grid references.",
+    "Dynamic exits, spawns, loot and enemy locations are not plotted in this verified key-room layer."
   ]
 }
