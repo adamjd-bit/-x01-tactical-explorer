@@ -30,14 +30,14 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 const host=document.querySelector('#view'),scene=new THREE.Scene();scene.background=new THREE.Color(0x151b1d);scene.fog=new THREE.Fog(0x151b1d,68,145);
 const camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,500);camera.position.set(26,24,29);
-const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.8));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.28;host.appendChild(renderer.domElement);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.35));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=false;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.28;host.appendChild(renderer.domElement);
 scene.add(new THREE.HemisphereLight(0xc4d2d5,0x39413d,1.35));const sun=new THREE.DirectionalLight(0xe0e8e8,2.0);sun.position.set(15,35,20);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
 const gridGroup=new THREE.Group(),markerGroup=new THREE.Group(),detailGroup=new THREE.Group();scene.add(gridGroup,markerGroup,detailGroup);
 function makeSurfaceTexture(base,kind='wall'){
  const c=document.createElement('canvas');c.width=1024;c.height=1024;const g=c.getContext('2d');
  g.fillStyle=base;g.fillRect(0,0,1024,1024);
  // Dense concrete/paint variation: mottling, scuffs, exposed aggregate and grime.
- for(let i=0;i<28000;i++){
+ for(let i=0;i<3200;i++){
   const v=Math.random(),x=Math.random()*1024,y=Math.random()*1024;
   g.fillStyle=v>.5?'rgba(220,226,221,.045)':'rgba(4,9,11,.085)';
   g.fillRect(x,y,1+Math.random()*5,1+Math.random()*4);
@@ -85,30 +85,14 @@ function clear(g){while(g.children.length){const o=g.children.pop();o.traverse?.
 function labelSprite(text,color='#eee8d6'){const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');x.fillStyle='rgba(10,14,10,.78)';x.fillRect(4,4,504,120);x.strokeStyle='#82965b';x.lineWidth=3;x.strokeRect(4,4,504,120);x.fillStyle=color;x.font='bold 31px system-ui';x.textAlign='center';x.fillText(text.slice(0,27),256,76);const t=new THREE.CanvasTexture(c),s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthTest:true}));s.scale.set(3.8,.78,1);return s}
 function addWall(x,z,w,d,h=1.05,material=matWall){
  const wall=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);
- wall.position.set(x,.18+h/2,z);wall.castShadow=true;wall.receiveShadow=true;gridGroup.add(wall);
- // Industrial cladding on both faces: modular plates, bolted seams and impact rails.
+ wall.position.set(x,.18+h/2,z);wall.castShadow=false;wall.receiveShadow=false;gridGroup.add(wall);
+ // Keep wall detail in the shared texture; only add a few structural rails.
  if(h>1.5){
-  const long=w>=d,span=Math.max(w,d),count=Math.max(1,Math.floor(span/.82));
-  const cladding=new THREE.MeshStandardMaterial({color:0x929b98,metalness:.38,roughness:.78});
-  const seam=new THREE.MeshStandardMaterial({color:0x303a3c,metalness:.5,roughness:.7});
-  const rail=new THREE.MeshStandardMaterial({color:0x30393b,metalness:.62,roughness:.66});
-  for(const face of [-1,1]){
-   for(let n=0;n<count;n++){
-    const len=span/count-.045,along=-span/2+(n+.5)*span/count;
-    const panel=new THREE.Mesh(new THREE.BoxGeometry(long?len:.035,1.38,long?.035:len),cladding);
-    panel.position.set(x+(long?along:face*(w/2+.025)),.18+h*.55,z+(long?face*(d/2+.025):along));gridGroup.add(panel);
-    const joint=new THREE.Mesh(new THREE.BoxGeometry(long?.035:.045,1.42,long?.045:.035),seam);
-    joint.position.set(x+(long?along+len/2+.018:face*(w/2+.048)),.18+h*.55,z+(long?face*(d/2+.048):along+len/2+.018));gridGroup.add(joint);
-    for(const yy of [.18+h*.55-.58,.18+h*.55+.58]){
-     const bolt=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,.025,8),rail);
-     bolt.rotation.x=Math.PI/2;
-     bolt.position.set(x+(long?along:face*(w/2+.055)),yy,z+(long?face*(d/2+.055):along));gridGroup.add(bolt);
-    }
-   }
-   const impact=new THREE.Mesh(new THREE.BoxGeometry(long?span:.09,.18,long?.09:span),rail);
-   impact.position.set(x,.39,z);gridGroup.add(impact);
-  }
-  const cap=new THREE.Mesh(new THREE.BoxGeometry(w+.06,.10,d+.06),rail);
+  const rail=new THREE.MeshStandardMaterial({color:0x30393b,metalness:.52,roughness:.72});
+  const long=w>=d,span=Math.max(w,d);
+  const impact=new THREE.Mesh(new THREE.BoxGeometry(long?span:.075,.16,long?.075:span),rail);
+  impact.position.set(x,.39,z);gridGroup.add(impact);
+  const cap=new THREE.Mesh(new THREE.BoxGeometry(w+.04,.07,d+.04),rail);
   cap.position.set(x,.18+h,z);gridGroup.add(cap);
  }
  return wall;
