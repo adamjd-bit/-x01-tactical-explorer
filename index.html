@@ -86,7 +86,7 @@ const data=await fetch('./data/x01-map-data.json').then(r=>{if(!r.ok)throw Error
 const cols=data.grid.columns,cell=4,offset=(cols.length-1)*cell/2;
 function pos(grid){const m=grid.match(/^([A-J])(\d)$/);if(!m)return [0,0];return [(cols.indexOf(m[1])*cell)-offset,(Number(m[2])-4.5)*cell]}
 function clear(g){while(g.children.length){const o=g.children.pop();o.traverse?.(v=>{v.geometry?.dispose?.()});}}
-function labelSprite(text,color='#eee8d6'){const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');x.fillStyle='rgba(10,14,10,.78)';x.fillRect(4,4,504,120);x.strokeStyle='#82965b';x.lineWidth=3;x.strokeRect(4,4,504,120);x.fillStyle=color;x.font='bold 31px system-ui';x.textAlign='center';x.fillText(text.slice(0,27),256,76);const t=new THREE.CanvasTexture(c),s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthTest:true}));s.scale.set(3.8,.78,1);return s}
+function labelSprite(text,color='#eee8d6'){const c=document.createElement('canvas');c.width=512;c.height=112;const x=c.getContext('2d');x.fillStyle='rgba(10,14,10,.72)';x.fillRect(10,10,492,92);x.strokeStyle='#82965b';x.lineWidth=2;x.strokeRect(10,10,492,92);x.fillStyle=color;x.font='bold 25px system-ui';x.textAlign='center';x.textBaseline='middle';x.fillText(text.slice(0,27),256,56,470);const t=new THREE.CanvasTexture(c),s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthTest:true}));s.scale.set(2.5,.55,1);return s}
 function addWall(x,z,w,d,h=1.05,material=matWall){
  const wall=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);
  wall.position.set(x,.18+h/2,z);wall.castShadow=false;wall.receiveShadow=false;gridGroup.add(wall);
@@ -141,7 +141,7 @@ function buildStationObject(f,x,z){
   const display=addPropBox(.17,.14,.025,0x68b6a0,.25);display.position.set(x+.48,1.04,z+.45);printerGroup.add(display);
   const warning=addPropBox(.18,.10,.025,0xd3a64e,.25);warning.position.set(x-.36,.48,z+.425);printerGroup.add(warning);
   const top=addPropBox(1.18,.10,.82,0x59615d,.8);top.position.set(x,1.70,z);printerGroup.add(top);
-  const tag=labelSprite('X01 FABRICATION UNIT','#d7d4c5');tag.position.set(x,2.05,z+.55);tag.scale.set(2.8,.52,1);printerGroup.add(tag);
+  const tag=labelSprite('X01 FABRICATION UNIT','#d7d4c5');tag.position.set(x,2.05,z+.55);tag.scale.set(1.85,.4,1);printerGroup.add(tag);
 
   printerGroup.position.y=1.35;gridGroup.add(printerGroup); }else if(f.name==='Keycard Encoder'){
   const base=addPropBox(.82,.12,.66,0x252c2d,.7);base.position.set(x,.27,z);gridGroup.add(base);
@@ -150,7 +150,7 @@ function buildStationObject(f,x,z){
   const screen=addPropBox(.38,.23,.025,0x6fae9b,.2);screen.position.set(x,.99,z+.28);gridGroup.add(screen);
   const slot=addPropBox(.22,.045,.035,0x111717,.7);slot.position.set(x,.57,z+.26);gridGroup.add(slot);
   const led=new THREE.Mesh(new THREE.SphereGeometry(.045,10,8),new THREE.MeshBasicMaterial({color:0x8ad2a0}));led.position.set(x+.22,1.36,z+.26);gridGroup.add(led);
-  const tag=labelSprite('KEYCARD ENCODER','#d7d4c5');tag.position.set(x,1.75,z+.4);tag.scale.set(2.5,.48,1);gridGroup.add(tag);
+  const tag=labelSprite('KEYCARD ENCODER','#d7d4c5');tag.position.set(x,1.75,z+.4);tag.scale.set(1.8,.39,1);gridGroup.add(tag);
  }
 }
 function buildAreaSetpiece(a,x,z){
@@ -393,7 +393,7 @@ function buildZone(a,i){
    for(let n=0;n<3;n++){const screen=new THREE.Mesh(new THREE.BoxGeometry(.95,.58,.06),new THREE.MeshBasicMaterial({color:n===1?0x1d5264:0x24465b}));screen.position.set(x-.95+n*.98,2.0,z-1.55);gridGroup.add(screen)}
   }
  }
- const nameTag=labelSprite(a.name);nameTag.position.set(x,3.25,z);nameTag.scale.set(Math.min(5.0,w+1.0),.72,1);gridGroup.add(nameTag);
+ const nameTag=labelSprite(a.name);nameTag.position.set(x,3.25,z);nameTag.scale.set(Math.min(3.35,Math.max(1.8,w*.78)),Math.min(.62,Math.max(.36,w*.145)),1);gridGroup.add(nameTag);
  buildAreaSetpiece(a,x,z);
 }
 function buildHallSegment(a,b,width=1.85){
@@ -468,10 +468,10 @@ function buildFloor(){
  for(const [x,z,sx,sz] of [[0,-21,43,.45],[0,21,43,.45],[-21,0,.45,43],[21,0,.45,43]]){const w=new THREE.Mesh(new THREE.BoxGeometry(sx,1.25,sz),matWall);w.position.set(x,.34,z);detailGroup.add(w)}
  for(let x=-19;x<=19;x+=4){const tick=new THREE.Mesh(new THREE.BoxGeometry(.09,.03,.7),matAccent);tick.position.set(x,.015,-20.2);detailGroup.add(tick)}
  // Coordinate grid intentionally removed from the rendered environment; this is an enclosed facility, not a green tactical grid.
- cols.forEach((letter,i)=>{const x=i*cell-offset,tag=labelSprite(letter,'#b7c99a');tag.position.set(x,.28,-21.2);tag.scale.set(.9,.55,1);detailGroup.add(tag)});
- for(let row=0;row<10;row++){const z=(row-4.5)*cell,tag=labelSprite(String(row),'#b7c99a');tag.position.set(-21.2,.28,z);tag.scale.set(.9,.55,1);detailGroup.add(tag)}
+ cols.forEach((letter,i)=>{const x=i*cell-offset,tag=labelSprite(letter,'#b7c99a');tag.position.set(x,.28,-21.2);tag.scale.set(.52,.32,1);detailGroup.add(tag)});
+ for(let row=0;row<10;row++){const z=(row-4.5)*cell,tag=labelSprite(String(row),'#b7c99a');tag.position.set(-21.2,.28,z);tag.scale.set(.52,.32,1);detailGroup.add(tag)}
  buildArchitecturalLinks(floor.areas);floor.areas.forEach((a,i)=>buildZone(a,i));
- data.markers.filter(m=>m.floor===floorId).forEach(m=>{const [x,z]=pos(m.grid),isKey=m.type==='key-room';const base=new THREE.Mesh(new THREE.CylinderGeometry(.38,.48,.22,6),isKey?matPin:matBlue);base.position.set(x,.62,z);base.castShadow=true;markerGroup.add(base);const ring=new THREE.Mesh(new THREE.TorusGeometry(.58,.045,8,28),new THREE.MeshBasicMaterial({color:isKey?0xe3b65d:0x78b6c1}));ring.rotation.x=Math.PI/2;ring.position.set(x,.76,z);markerGroup.add(ring);const s=labelSprite(m.name,isKey?'#f1d49a':'#b9dce1');s.position.set(x,1.48,z);s.scale.set(3.8,.78,1);markerGroup.add(s)});
+ data.markers.filter(m=>m.floor===floorId).forEach(m=>{const [x,z]=pos(m.grid),isKey=m.type==='key-room';const base=new THREE.Mesh(new THREE.CylinderGeometry(.38,.48,.22,6),isKey?matPin:matBlue);base.position.set(x,.62,z);base.castShadow=true;markerGroup.add(base);const ring=new THREE.Mesh(new THREE.TorusGeometry(.58,.045,8,28),new THREE.MeshBasicMaterial({color:isKey?0xe3b65d:0x78b6c1}));ring.rotation.x=Math.PI/2;ring.position.set(x,.76,z);markerGroup.add(ring);const s=labelSprite(m.name,isKey?'#f1d49a':'#b9dce1');s.position.set(x,1.48,z);s.scale.set(2.45,.54,1);markerGroup.add(s)});
  (data.features||[]).filter(f=>f.floors.includes(floorId)).forEach(f=>{const [x,z]=pos(f.grid);if(f.type==='station')buildStationObject(f,f.name==='3D Printer'?x-1.15:x,f.name==='3D Printer'?z-.55:z);let color=0x8fb6a0,geo=new THREE.OctahedronGeometry(.34,.0),y=1.02;
  if(f.type==='stairs'){color=0xa9b4a1;geo=new THREE.BoxGeometry(.65,.16,.65);y=.78}
  if(f.type==='ascender'){color=0x77c5d0;geo=new THREE.CylinderGeometry(.09,.09,1.25,8);y=1.12}
@@ -481,8 +481,8 @@ function buildFloor(){
  if(f.type==='spawn'){color=0x9cb8d0;geo=new THREE.ConeGeometry(.26,.52,4);y=.88}
  const mesh=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.12,metalness:.3,roughness:.55}));mesh.position.set(x,y,z);mesh.castShadow=true;markerGroup.add(mesh);
  const ring=new THREE.Mesh(new THREE.TorusGeometry(.48,.025,6,24),new THREE.MeshBasicMaterial({color}));ring.rotation.x=Math.PI/2;ring.position.set(x,.67,z);markerGroup.add(ring);
- if(['exfil','station','secret'].includes(f.type)){const tag=labelSprite(f.name,'#d9e4d7');tag.position.set(x,2.15,z);tag.scale.set(4.2,.85,1);markerGroup.add(tag)}});
- if(floorId==='lower'){const pts=[[-19,-19],[19,-19],[19,19],[-19,19],[-19,-19]].map(([x,z])=>new THREE.Vector3(x,.16,z));const path=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineDashedMaterial({color:0x6b9876,dashSize:.8,gapSize:.42,transparent:true,opacity:.8}));path.computeLineDistances();detailGroup.add(path);const tunnel=labelSprite('LOGISTICS TUNNEL · PERIMETER','#b8d0ad');tunnel.position.set(0,.9,-19.1);tunnel.scale.set(7,.9,1);detailGroup.add(tunnel)}
+ if(['exfil','station','secret'].includes(f.type)){const tag=labelSprite(f.name,'#d9e4d7');tag.position.set(x,2.15,z);tag.scale.set(2.65,.58,1);markerGroup.add(tag)}});
+ if(floorId==='lower'){const pts=[[-19,-19],[19,-19],[19,19],[-19,19],[-19,-19]].map(([x,z])=>new THREE.Vector3(x,.16,z));const path=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineDashedMaterial({color:0x6b9876,dashSize:.8,gapSize:.42,transparent:true,opacity:.8}));path.computeLineDistances();detailGroup.add(path);const tunnel=labelSprite('LOGISTICS TUNNEL · PERIMETER','#b8d0ad');tunnel.position.set(0,.9,-19.1);tunnel.scale.set(4.6,.72,1);detailGroup.add(tunnel)}
  target.set(0,0,0);setMode(mode);document.querySelector('#status').textContent=floor.name.toUpperCase()+' · '+data.markers.filter(m=>m.floor===floorId).length+' VERIFIED KEY-ROOM REFERENCES';
 }
 function panBy(dx,dy){camera.updateMatrixWorld();const right=new THREE.Vector3().setFromMatrixColumn(camera.matrix,0),up=new THREE.Vector3().setFromMatrixColumn(camera.matrix,1);const scale= camera.position.distanceTo(target)*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*2/innerHeight;const shift=right.multiplyScalar(-dx*scale).add(up.multiplyScalar(dy*scale));camera.position.add(shift);target.add(shift)}
