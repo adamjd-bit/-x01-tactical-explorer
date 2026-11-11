@@ -49,7 +49,7 @@ const data=await fetch('./data/x01-map-data.json').then(r=>{if(!r.ok)throw Error
 const cols=data.grid.columns,cell=4,offset=(cols.length-1)*cell/2;
 function pos(grid){const m=grid.match(/^([A-J])(\d)$/);if(!m)return [0,0];return [(cols.indexOf(m[1])*cell)-offset,(Number(m[2])-4.5)*cell]}
 function clear(g){while(g.children.length){const o=g.children.pop();o.traverse?.(v=>{v.geometry?.dispose?.()});}}
-function labelSprite(text,color='#eee8d6'){const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');x.fillStyle='rgba(10,14,10,.78)';x.fillRect(4,4,504,120);x.strokeStyle='#82965b';x.lineWidth=3;x.strokeRect(4,4,504,120);x.fillStyle=color;x.font='bold 31px system-ui';x.textAlign='center';x.fillText(text.slice(0,27),256,76);const t=new THREE.CanvasTexture(c),s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthTest:false}));s.scale.set(5.6,1.4,1);return s}
+function labelSprite(text,color='#eee8d6'){const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');x.fillStyle='rgba(10,14,10,.78)';x.fillRect(4,4,504,120);x.strokeStyle='#82965b';x.lineWidth=3;x.strokeRect(4,4,504,120);x.fillStyle=color;x.font='bold 31px system-ui';x.textAlign='center';x.fillText(text.slice(0,27),256,76);const t=new THREE.CanvasTexture(c),s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthTest:true}));s.scale.set(3.8,.78,1);return s}
 function addWall(x,z,w,d,h=1.05,material=matWall){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);o.position.set(x,.18+h/2,z);o.castShadow=true;o.receiveShadow=true;gridGroup.add(o);return o}
 function addDoor(x,z,axis='x'){const frameMat=matAccent;for(const side of [-.48,.48]){const p=new THREE.Mesh(new THREE.BoxGeometry(.12,.92,.12),frameMat);p.position.set(x+(axis==='x'?side:0),.66,z+(axis==='z'?side:0));gridGroup.add(p)}const lintel=new THREE.Mesh(new THREE.BoxGeometry(axis==='x'?1.08:.12,.12,axis==='z'?1.08:.12),matWall);lintel.position.set(x,1.18,z);gridGroup.add(lintel)}
 function addPropBox(w,h,d,color,metalness=.35){return new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color,metalness,roughness:.62}))}
@@ -143,20 +143,20 @@ function buildAreaSetpiece(a,x,z){
  }
 }
 const roomProfiles={
- 'Deep Vault':{w:4.5,d:3.8,entry:['east','south'],tone:0x343b3e},
- 'Supply Depot':{w:3.2,d:3.1,entry:['south','west','east'],tone:0x46504c},
- 'Pump Station':{w:3.1,d:3.2,entry:['west','south','east'],tone:0x35464a},
- 'Power Generators':{w:3.1,d:3.2,entry:['west','north','east','south'],tone:0x343d40},
- 'T.E.C.H. Lab':{w:3.3,d:3.4,entry:['west','east','south'],tone:0x3c4a4d},
- 'Bio Lab':{w:3.3,d:3.3,entry:['west','north','east'],tone:0x34463f},
- 'Medical Wing':{w:3.8,d:3.3,entry:['north','east'],tone:0x46504b},
- 'Production Assembly':{w:4.5,d:3.8,entry:['north','east','west'],tone:0x424a49},
- 'Data Center':{w:4.8,d:4.0,entry:['west','south'],tone:0x303c43},
- 'Cargo Bay':{w:4.4,d:3.8,entry:['east','south'],tone:0x454c4d},
- 'Control Room':{w:3.6,d:3.2,entry:['west','south','east'],tone:0x303b40},
- 'Main Warehouse':{w:4.8,d:4.0,entry:['north','west','east','south'],tone:0x41494a},
- 'Motor Pool':{w:4.2,d:3.6,entry:['north','west'],tone:0x454b49},
- 'Admin Offices':{w:3.8,d:3.4,entry:['east','south'],tone:0x4a4c47}
+ 'Deep Vault':{w:3.15,d:2.9},entry:['east','south'],tone:0x343b3e},
+ 'Supply Depot':{w:2.95,d:2.8},entry:['south','west','east'],tone:0x46504c},
+ 'Pump Station':{w:2.85,d:2.8},entry:['west','south','east'],tone:0x35464a},
+ 'Power Generators':{w:2.85,d:2.8},entry:['west','north','east','south'],tone:0x343d40},
+ 'T.E.C.H. Lab':{w:2.95,d:2.9},entry:['west','east','south'],tone:0x3c4a4d},
+ 'Bio Lab':{w:2.95,d:2.85},entry:['west','north','east'],tone:0x34463f},
+ 'Medical Wing':{w:3.05,d:2.85},entry:['north','east'],tone:0x46504b},
+ 'Production Assembly':{w:3.35,d:3.05},entry:['north','east','west'],tone:0x424a49},
+ 'Data Center':{w:3.45,d:3.15},entry:['west','south'],tone:0x303c43},
+ 'Cargo Bay':{w:3.35,d:3.05},entry:['east','south'],tone:0x454c4d},
+ 'Control Room':{w:3.0,d:2.8},entry:['west','south','east'],tone:0x303b40},
+ 'Main Warehouse':{w:3.5,d:3.2},entry:['north','west','east','south'],tone:0x41494a},
+ 'Motor Pool':{w:3.3,d:3.0},entry:['north','west'],tone:0x454b49},
+ 'Admin Offices':{w:3.0,d:2.9},entry:['east','south'],tone:0x4a4c47}
 };
 function areaPosition(a){
  const [x,z]=pos(a.grid);
@@ -208,42 +208,42 @@ function buildZone(a,i){
  // Full-height concrete/steel bulkheads with actual door openings.
  const bulkhead=new THREE.MeshStandardMaterial({color:0x667176,roughness:.86,metalness:.3,map:wallTexture});
  for(const side of ['north','south','east','west']){
-  if(p.entry.includes(side))wallOpening(x,z,w,d,side,1.35,2.72,bulkhead);
-  else if(side==='north'||side==='south')addWall(x,z+(side==='north'?-d/2:d/2),w,.18,2.72,bulkhead);
-  else addWall(x+(side==='west'?-w/2:w/2),z,.18,d,2.72,bulkhead);
+  if(p.entry.includes(side))wallOpening(x,z,w,d,side,1.62,2.05,bulkhead);
+  else if(side==='north'||side==='south')addWall(x,z+(side==='north'?-d/2:d/2),w,.18,2.05,bulkhead);
+  else addWall(x+(side==='west'?-w/2:w/2),z,.18,d,2.05,bulkhead);
  }
  // Wall ribs, lower impact rails, upper cable trays and structural roof beams.
  const ribMat=new THREE.MeshStandardMaterial({color:0x7b8587,metalness:.62,roughness:.62});
  for(const side of [-1,1]){
   for(let n=0;n<Math.floor(d/1.05);n++){
-   const rib=new THREE.Mesh(new THREE.BoxGeometry(.11,2.45,.12),ribMat);
-   rib.position.set(x+side*(w/2-.13),1.42,z-d/2+.55+n*1.05);gridGroup.add(rib);
+   const rib=new THREE.Mesh(new THREE.BoxGeometry(.11,1.82,.12),ribMat);
+   rib.position.set(x+side*(w/2-.13),1.04,z-d/2+.55+n*1.05);gridGroup.add(rib);
   }
   const kick=new THREE.Mesh(new THREE.BoxGeometry(.08,.22,d-.25),darkSteel);
   kick.position.set(x+side*(w/2-.20),.34,z);gridGroup.add(kick);
  }
  const roofMat=new THREE.MeshStandardMaterial({color:0x9ba8a8,metalness:.25,roughness:.55,transparent:true,opacity:.045,depthWrite:false,side:THREE.DoubleSide});
  const roof=new THREE.Mesh(new THREE.BoxGeometry(w, .07,d),roofMat);
- roof.position.set(x,3.02,z);gridGroup.add(roof);
+ roof.position.set(x,2.34,z);gridGroup.add(roof);
  for(const side of [-1,1]){
   const beam=new THREE.Mesh(new THREE.BoxGeometry(.13,.16,d+.12),ribMat);
-  beam.position.set(x+side*(w/2-.1),2.96,z);gridGroup.add(beam);
+  beam.position.set(x+side*(w/2-.1),2.29,z);gridGroup.add(beam);
  }
  for(let n=0;n<Math.floor(w/1.7);n++){
   const beam=new THREE.Mesh(new THREE.BoxGeometry(.10,.12,d),ribMat);
-  beam.position.set(x-w/2+.9+n*1.7,2.96,z);gridGroup.add(beam);
+  beam.position.set(x-w/2+.9+n*1.7,2.29,z);gridGroup.add(beam);
  }
  const tray=new THREE.Mesh(new THREE.BoxGeometry(w-.6,.10,.18),darkSteel);
- tray.position.set(x,2.63,z-d/2+.3);gridGroup.add(tray);
+ tray.position.set(x,2.02,z-d/2+.3);gridGroup.add(tray);
  for(let n=0;n<3;n++){
   const pipe=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,d-.5,8),steel);
-  pipe.rotation.x=Math.PI/2;pipe.position.set(x-w/2+.35+n*.13,2.48,z);gridGroup.add(pipe);
+  pipe.rotation.x=Math.PI/2;pipe.position.set(x-w/2+.35+n*.13,1.92,z);gridGroup.add(pipe);
  }
  // Practical overhead fixtures and local pools of light.
  for(const dx of [-w*.25,w*.25]){
   const fixture=new THREE.Mesh(new THREE.BoxGeometry(.9,.07,.22),new THREE.MeshBasicMaterial({color:0xc5d4c5}));
-  fixture.position.set(x+dx,2.55,z);gridGroup.add(fixture);
-  const lamp=new THREE.PointLight(0xc0d6c7,.42,7,2);lamp.position.set(x+dx,2.35,z);gridGroup.add(lamp);
+  fixture.position.set(x+dx,1.98,z);gridGroup.add(fixture);
+  const lamp=new THREE.PointLight(0xc0d6c7,.42,7,2);lamp.position.set(x+dx,1.82,z);gridGroup.add(lamp);
  }
  // Room-specific partitions create distinct floorplans instead of repeated empty boxes.
  if(a.name==='Data Center'){
@@ -323,7 +323,7 @@ function buildZone(a,i){
  const nameTag=labelSprite(a.name);nameTag.position.set(x,3.25,z);nameTag.scale.set(Math.min(5.0,w+1.0),.72,1);gridGroup.add(nameTag);
  buildAreaSetpiece(a,x,z);
 }
-function buildHallSegment(a,b,width=1.5){
+function buildHallSegment(a,b,width=1.85){
  const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz);
  if(len<.2)return;
  const horizontal=Math.abs(dx)>=Math.abs(dz),midX=(a[0]+b[0])/2,midZ=(a[1]+b[1])/2;
@@ -340,16 +340,16 @@ function buildHallSegment(a,b,width=1.5){
  for(const side of [-1,1]){
   const offset=side*width/2;
   const wx=horizontal?midX:midX+offset,wz=horizontal?midZ+offset:midZ;
-  const wall=new THREE.Mesh(new THREE.BoxGeometry(horizontal?len: .16,2.65,horizontal?.16:len),wallMat);
-  wall.position.set(wx,1.43,wz);wall.castShadow=true;wall.receiveShadow=true;gridGroup.add(wall);
+  const wall=new THREE.Mesh(new THREE.BoxGeometry(horizontal?len: .16,1.95,horizontal?.16:len),wallMat);
+  wall.position.set(wx,1.05,wz);wall.castShadow=true;wall.receiveShadow=true;gridGroup.add(wall);
   const kick=new THREE.Mesh(new THREE.BoxGeometry(horizontal?len:.2,.20,horizontal?.2:len),new THREE.MeshStandardMaterial({color:0x9b7845,metalness:.55,roughness:.62}));
   kick.position.set(wx,.34,wz);gridGroup.add(kick);
  }
  const service=new THREE.Mesh(new THREE.BoxGeometry(horizontal?len:.14,.12,horizontal?.14:len),new THREE.MeshStandardMaterial({color:0x242d31,metalness:.55,roughness:.72}));
- service.position.set(midX,2.68,midZ);gridGroup.add(service);
+ service.position.set(midX,1.98,midZ);gridGroup.add(service);
  const light=new THREE.Mesh(new THREE.BoxGeometry(horizontal?Math.min(1.5,len):.18,.055,horizontal?.18:Math.min(1.5,len)),new THREE.MeshBasicMaterial({color:0xc4d7d3}));
- light.position.set(midX,2.45,midZ);gridGroup.add(light);
- const point=new THREE.PointLight(0xa8c7c8,.28,6,2);point.position.set(midX,2.25,midZ);gridGroup.add(point);
+ light.position.set(midX,1.82,midZ);gridGroup.add(light);
+ const point=new THREE.PointLight(0xa8c7c8,.28,6,2);point.position.set(midX,1.68,midZ);gridGroup.add(point);
 }
 function buildArchitecturalLinks(areas){
  const byName=Object.fromEntries(areas.map(a=>[a.name,a]));
@@ -387,7 +387,7 @@ function buildFloor(){
  cols.forEach((letter,i)=>{const x=i*cell-offset,tag=labelSprite(letter,'#b7c99a');tag.position.set(x,.28,-21.2);tag.scale.set(.9,.55,1);detailGroup.add(tag)});
  for(let row=0;row<10;row++){const z=(row-4.5)*cell,tag=labelSprite(String(row),'#b7c99a');tag.position.set(-21.2,.28,z);tag.scale.set(.9,.55,1);detailGroup.add(tag)}
  buildArchitecturalLinks(floor.areas);floor.areas.forEach((a,i)=>buildZone(a,i));
- data.markers.filter(m=>m.floor===floorId).forEach(m=>{const [x,z]=pos(m.grid),isKey=m.type==='key-room';const base=new THREE.Mesh(new THREE.CylinderGeometry(.38,.48,.22,6),isKey?matPin:matBlue);base.position.set(x,.62,z);base.castShadow=true;markerGroup.add(base);const ring=new THREE.Mesh(new THREE.TorusGeometry(.58,.045,8,28),new THREE.MeshBasicMaterial({color:isKey?0xe3b65d:0x78b6c1}));ring.rotation.x=Math.PI/2;ring.position.set(x,.76,z);markerGroup.add(ring);const s=labelSprite(m.name,isKey?'#f1d49a':'#b9dce1');s.position.set(x,2.05,z);s.scale.set(5.4,1.2,1);markerGroup.add(s)});
+ data.markers.filter(m=>m.floor===floorId).forEach(m=>{const [x,z]=pos(m.grid),isKey=m.type==='key-room';const base=new THREE.Mesh(new THREE.CylinderGeometry(.38,.48,.22,6),isKey?matPin:matBlue);base.position.set(x,.62,z);base.castShadow=true;markerGroup.add(base);const ring=new THREE.Mesh(new THREE.TorusGeometry(.58,.045,8,28),new THREE.MeshBasicMaterial({color:isKey?0xe3b65d:0x78b6c1}));ring.rotation.x=Math.PI/2;ring.position.set(x,.76,z);markerGroup.add(ring);const s=labelSprite(m.name,isKey?'#f1d49a':'#b9dce1');s.position.set(x,1.48,z);s.scale.set(3.8,.78,1);markerGroup.add(s)});
  (data.features||[]).filter(f=>f.floors.includes(floorId)).forEach(f=>{const [x,z]=pos(f.grid);if(f.type==='station')buildStationObject(f,f.name==='3D Printer'?x-1.15:x,f.name==='3D Printer'?z-.55:z);let color=0x8fb6a0,geo=new THREE.OctahedronGeometry(.34,.0),y=1.02;
  if(f.type==='stairs'){color=0xa9b4a1;geo=new THREE.BoxGeometry(.65,.16,.65);y=.78}
  if(f.type==='ascender'){color=0x77c5d0;geo=new THREE.CylinderGeometry(.09,.09,1.25,8);y=1.12}
