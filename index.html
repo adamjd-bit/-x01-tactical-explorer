@@ -55,20 +55,22 @@ function addDoor(x,z,axis='x'){const frameMat=matAccent;for(const side of [-.48,
 function addPropBox(w,h,d,color,metalness=.35){return new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color,metalness,roughness:.62}))}
 function buildStationObject(f,x,z){
  if(f.name==='3D Printer'){
+  const printerGroup=new THREE.Group();
   // Enclosed industrial fabrication cabinet: frame, tinted access door, build chamber, gantry and control panel.
-  const base=addPropBox(1.18,.16,.82,0x242a2b,.7);base.position.set(x,.30,z);gridGroup.add(base);
-  const cabinet=addPropBox(1.05,1.32,.72,0x3a4242,.72);cabinet.position.set(x,.98,z);gridGroup.add(cabinet);
-  const cavity=addPropBox(.76,.88,.035,0x111a1b,.35);cavity.position.set(x,.98,z+.38);gridGroup.add(cavity);
-  const glass=addPropBox(.68,.78,.025,0x315052,.45);glass.material.transparent=true;glass.material.opacity=.58;glass.position.set(x,.99,z+.405);gridGroup.add(glass);
-  const bed=addPropBox(.52,.055,.43,0x9ba6a0,.75);bed.position.set(x,.70,z+.19);gridGroup.add(bed);
-  const rail=addPropBox(.62,.055,.055,0xa8b1a9,.8);rail.position.set(x,.1+1.40,z+.16);gridGroup.add(rail);
-  const head=addPropBox(.16,.18,.16,0xd1a34e,.55);head.position.set(x+.08,1.29,z+.12);gridGroup.add(head);
-  const panel=addPropBox(.24,.36,.08,0x171d1d,.65);panel.position.set(x+.48,.98,z+.40);gridGroup.add(panel);
-  const display=addPropBox(.17,.14,.025,0x68b6a0,.25);display.position.set(x+.48,1.04,z+.45);gridGroup.add(display);
-  const warning=addPropBox(.18,.10,.025,0xd3a64e,.25);warning.position.set(x-.36,.48,z+.425);gridGroup.add(warning);
-  const top=addPropBox(1.18,.10,.82,0x59615d,.8);top.position.set(x,1.70,z);gridGroup.add(top);
-  const tag=labelSprite('X01 FABRICATION UNIT','#d7d4c5');tag.position.set(x,2.05,z+.55);tag.scale.set(2.8,.52,1);gridGroup.add(tag);
- }else if(f.name==='Keycard Encoder'){
+  const base=addPropBox(1.18,.16,.82,0x242a2b,.7);base.position.set(x,.30,z);printerGroup.add(base);
+  const cabinet=addPropBox(1.05,1.32,.72,0x3a4242,.72);cabinet.position.set(x,.98,z);printerGroup.add(cabinet);
+  const cavity=addPropBox(.76,.88,.035,0x111a1b,.35);cavity.position.set(x,.98,z+.38);printerGroup.add(cavity);
+  const glass=addPropBox(.68,.78,.025,0x315052,.45);glass.material.transparent=true;glass.material.opacity=.58;glass.position.set(x,.99,z+.405);printerGroup.add(glass);
+  const bed=addPropBox(.52,.055,.43,0x9ba6a0,.75);bed.position.set(x,.70,z+.19);printerGroup.add(bed);
+  const rail=addPropBox(.62,.055,.055,0xa8b1a9,.8);rail.position.set(x,.1+1.40,z+.16);printerGroup.add(rail);
+  const head=addPropBox(.16,.18,.16,0xd1a34e,.55);head.position.set(x+.08,1.29,z+.12);printerGroup.add(head);
+  const panel=addPropBox(.24,.36,.08,0x171d1d,.65);panel.position.set(x+.48,.98,z+.40);printerGroup.add(panel);
+  const display=addPropBox(.17,.14,.025,0x68b6a0,.25);display.position.set(x+.48,1.04,z+.45);printerGroup.add(display);
+  const warning=addPropBox(.18,.10,.025,0xd3a64e,.25);warning.position.set(x-.36,.48,z+.425);printerGroup.add(warning);
+  const top=addPropBox(1.18,.10,.82,0x59615d,.8);top.position.set(x,1.70,z);printerGroup.add(top);
+  const tag=labelSprite('X01 FABRICATION UNIT','#d7d4c5');tag.position.set(x,2.05,z+.55);tag.scale.set(2.8,.52,1);printerGroup.add(tag);
+
+  printerGroup.position.y=1.35;gridGroup.add(printerGroup); }else if(f.name==='Keycard Encoder'){
   const base=addPropBox(.82,.12,.66,0x252c2d,.7);base.position.set(x,.27,z);gridGroup.add(base);
   const kiosk=addPropBox(.68,1.12,.48,0x777f7b,.72);kiosk.position.set(x,.88,z);gridGroup.add(kiosk);
   const face=addPropBox(.48,.38,.035,0x202b2c,.35);face.position.set(x,.99,z+.255);gridGroup.add(face);
@@ -254,6 +256,12 @@ function buildZone(a,i){
    }
   }
  }else if(a.name==='Production Assembly'){
+  // West-side mezzanine office: the X01 printer sits above the assembly floor.
+  const catwalk=new THREE.Mesh(new THREE.BoxGeometry(1.9,.16,1.55),new THREE.MeshStandardMaterial({color:0x4c585a,metalness:.55,roughness:.72}));
+  catwalk.position.set(x-1.15,1.34,z-.55);gridGroup.add(catwalk);
+  for(const side of [-1,1]){const rail=new THREE.Mesh(new THREE.BoxGeometry(.07,.85,1.55),new THREE.MeshStandardMaterial({color:0xb18a4c,metalness:.55,roughness:.55}));rail.position.set(x-1.15+side*.9,1.78,z-.55);gridGroup.add(rail)}
+  for(let n=0;n<6;n++){const step=new THREE.Mesh(new THREE.BoxGeometry(.72,.16,.28),new THREE.MeshStandardMaterial({color:0x667276,metalness:.5,roughness:.7}));step.position.set(x+.05,.28+n*.18,z-.95+n*.23);gridGroup.add(step)}
+  const ladder=new THREE.Mesh(new THREE.BoxGeometry(.08,1.45,.08),new THREE.MeshStandardMaterial({color:0xd2a34e,metalness:.55}));ladder.position.set(x-2.0,1.12,z+.55);gridGroup.add(ladder);
   const line=new THREE.Mesh(new THREE.BoxGeometry(w-1.0,.22,.82),darkSteel);line.position.set(x,.43,z-.25);gridGroup.add(line);
   for(let n=0;n<10;n++){
    const roller=new THREE.Mesh(new THREE.CylinderGeometry(.09,.09,.86,12),steel);
@@ -273,6 +281,11 @@ function buildZone(a,i){
    bolt.rotation.x=Math.PI/2;bolt.position.set(x+Math.cos(t)*1.18,1.35+Math.sin(t)*1.18,z-d/2+.56);gridGroup.add(bolt);
   }
  }else if(a.name==='Bio Lab'||a.name==='T.E.C.H. Lab'){
+  if(a.name==='Bio Lab'){
+   const pool=new THREE.Mesh(new THREE.BoxGeometry(1.45,.07,2.25),new THREE.MeshStandardMaterial({color:0x254c50,metalness:.18,roughness:.24,transparent:true,opacity:.86}));pool.position.set(x+.65,.18,z+.15);gridGroup.add(pool);
+   for(const side of [-1,1]){const rail=new THREE.Mesh(new THREE.BoxGeometry(.08,.72,2.35),new THREE.MeshStandardMaterial({color:0xc19a4d,metalness:.5}));rail.position.set(x+.65+side*.82,.55,z+.15);gridGroup.add(rail)}
+   for(const px of [.25,1.05]){const fan=new THREE.Mesh(new THREE.TorusGeometry(.24,.045,8,24),new THREE.MeshStandardMaterial({color:0x829092,metalness:.7}));fan.position.set(x+px,.24,z+.15);gridGroup.add(fan);for(let n=0;n<4;n++){const blade=new THREE.Mesh(new THREE.BoxGeometry(.34,.035,.06),new THREE.MeshStandardMaterial({color:0x718083,metalness:.65}));blade.position.set(x+px,.23,z+.15);blade.rotation.y=n*Math.PI/2;gridGroup.add(blade)}}
+  }
   for(const px of [-1.0,1.0]){
    const tank=new THREE.Mesh(new THREE.CylinderGeometry(.34,.34,1.75,18),new THREE.MeshStandardMaterial({color:0x537a79,transparent:true,opacity:.42,metalness:.3,roughness:.2}));
    tank.position.set(x+px,1.15,z-.45);gridGroup.add(tank);
@@ -297,6 +310,14 @@ function buildZone(a,i){
    const desk=new THREE.Mesh(new THREE.BoxGeometry(.9,.16,.55),darkSteel);desk.position.set(x-.95+n*.95,.65,z-.65);gridGroup.add(desk);
    const monitor=new THREE.Mesh(new THREE.BoxGeometry(.52,.38,.055),new THREE.MeshBasicMaterial({color:n===1?0x7fc1b2:0x7199a5}));
    monitor.position.set(x-.95+n*.95,.95,z-.87);gridGroup.add(monitor);
+  }
+  if(a.name==='Admin Offices'){
+   // Surveillance bay: dark blue monitor wall and compact server cabinets.
+   for(let n=0;n<4;n++){
+    const rack=new THREE.Mesh(new THREE.BoxGeometry(.48,1.75,.5),new THREE.MeshStandardMaterial({color:0x202d36,metalness:.55,roughness:.68}));rack.position.set(x-1.55+n*.55,1.05,z+1.15);gridGroup.add(rack);
+    for(let k=0;k<4;k++){const led=new THREE.Mesh(new THREE.BoxGeometry(.06,.045,.025),new THREE.MeshBasicMaterial({color:k%2?0x62a68e:0x83a8bd}));led.position.set(x-1.55+n*.55,.48+k*.3,z+.88);gridGroup.add(led)}
+   }
+   for(let n=0;n<3;n++){const screen=new THREE.Mesh(new THREE.BoxGeometry(.95,.58,.06),new THREE.MeshBasicMaterial({color:n===1?0x1d5264:0x24465b}));screen.position.set(x-.95+n*.98,2.0,z-1.55);gridGroup.add(screen)}
   }
  }
  const nameTag=labelSprite(a.name);nameTag.position.set(x,3.25,z);nameTag.scale.set(Math.min(5.0,w+1.0),.72,1);gridGroup.add(nameTag);
@@ -367,7 +388,7 @@ function buildFloor(){
  for(let row=0;row<10;row++){const z=(row-4.5)*cell,tag=labelSprite(String(row),'#b7c99a');tag.position.set(-21.2,.28,z);tag.scale.set(.9,.55,1);detailGroup.add(tag)}
  buildArchitecturalLinks(floor.areas);floor.areas.forEach((a,i)=>buildZone(a,i));
  data.markers.filter(m=>m.floor===floorId).forEach(m=>{const [x,z]=pos(m.grid),isKey=m.type==='key-room';const base=new THREE.Mesh(new THREE.CylinderGeometry(.38,.48,.22,6),isKey?matPin:matBlue);base.position.set(x,.62,z);base.castShadow=true;markerGroup.add(base);const ring=new THREE.Mesh(new THREE.TorusGeometry(.58,.045,8,28),new THREE.MeshBasicMaterial({color:isKey?0xe3b65d:0x78b6c1}));ring.rotation.x=Math.PI/2;ring.position.set(x,.76,z);markerGroup.add(ring);const s=labelSprite(m.name,isKey?'#f1d49a':'#b9dce1');s.position.set(x,2.05,z);s.scale.set(5.4,1.2,1);markerGroup.add(s)});
- (data.features||[]).filter(f=>f.floors.includes(floorId)).forEach(f=>{const [x,z]=pos(f.grid);if(f.type==='station')buildStationObject(f,x,z);let color=0x8fb6a0,geo=new THREE.OctahedronGeometry(.34,.0),y=1.02;
+ (data.features||[]).filter(f=>f.floors.includes(floorId)).forEach(f=>{const [x,z]=pos(f.grid);if(f.type==='station')buildStationObject(f,f.name==='3D Printer'?x-1.15:x,f.name==='3D Printer'?z-.55:z);let color=0x8fb6a0,geo=new THREE.OctahedronGeometry(.34,.0),y=1.02;
  if(f.type==='stairs'){color=0xa9b4a1;geo=new THREE.BoxGeometry(.65,.16,.65);y=.78}
  if(f.type==='ascender'){color=0x77c5d0;geo=new THREE.CylinderGeometry(.09,.09,1.25,8);y=1.12}
  if(f.type==='exfil'){color=0x74b6ce;geo=new THREE.CylinderGeometry(.42,.42,.22,12);y=.82}
