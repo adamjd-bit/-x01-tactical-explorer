@@ -26,6 +26,10 @@
 </style></head><body><div id="view"></div><header><div class="brand">THE VETERAN LOBBY</div><h1>X01 BLACK SITE · TACTICAL EXPLORER</h1></header>
 <nav class="floorbar" aria-label="Choose X01 floor"><button id="lower" class="active">FIRST FLOOR</button><button id="upper">SECOND FLOOR</button></nav><div id="zoomControls" aria-label="Map zoom"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button></div><section class="panel" aria-label="View controls"><div class="controls"><span class="mode-label">VIEW</span><button id="orbit" class="active">3D</button><button id="walk">WALK</button><button id="reset" aria-label="Reset view">↺</button></div><div id="pad"><button data-move="forward">▲</button><button data-move="left">◀</button><button data-move="back">▼</button><button data-move="right">▶</button></div></section>
 <div id="legend"><div><span class="dot" style="background:#82965b"></span>Area reference</div><div><span class="dot" style="background:#d3ae65"></span>Key room / objective</div><div><span class="dot" style="background:#6f9eb0"></span>Exfil / service</div><div><span class="dot" style="background:#a9b4a1"></span>Stairs</div><div><span class="dot" style="background:#77c5d0"></span>Ascender</div><div><span class="dot" style="background:#9cb8d0"></span>Infil point</div></div><div id="status">LOADING X01 MAP DATA…</div>
+<script>
+window.addEventListener('error',e=>{const s=document.querySelector('#status');if(s)s.textContent='X01 ERROR: '+(e.message||'Unable to start 3D scene');});
+window.addEventListener('unhandledrejection',e=>{const s=document.querySelector('#status');if(s)s.textContent='X01 ERROR: '+(e.reason?.message||String(e.reason)||'Map data failed to load');});
+</script>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 const host=document.querySelector('#view'),scene=new THREE.Scene();scene.background=new THREE.Color(0x151b1d);scene.fog=new THREE.Fog(0x151b1d,68,145);
@@ -212,20 +216,20 @@ function buildAreaSetpiece(a,x,z){
  }
 }
 const roomProfiles={
- 'Deep Vault':{w:3.15,d:2.9},entry:['east','south'],tone:0x343b3e},
- 'Supply Depot':{w:2.95,d:2.8},entry:['south','west','east'],tone:0x46504c},
- 'Pump Station':{w:2.85,d:2.8},entry:['west','south','east'],tone:0x35464a},
- 'Power Generators':{w:2.85,d:2.8},entry:['west','north','east','south'],tone:0x343d40},
- 'T.E.C.H. Lab':{w:2.95,d:2.9},entry:['west','east','south'],tone:0x3c4a4d},
- 'Bio Lab':{w:2.95,d:2.85},entry:['west','north','east'],tone:0x34463f},
- 'Medical Wing':{w:3.05,d:2.85},entry:['north','east'],tone:0x46504b},
- 'Production Assembly':{w:3.35,d:3.05},entry:['north','east','west'],tone:0x424a49},
- 'Data Center':{w:3.45,d:3.15},entry:['west','south'],tone:0x303c43},
- 'Cargo Bay':{w:3.35,d:3.05},entry:['east','south'],tone:0x454c4d},
- 'Control Room':{w:3.0,d:2.8},entry:['west','south','east'],tone:0x303b40},
- 'Main Warehouse':{w:3.5,d:3.2},entry:['north','west','east','south'],tone:0x41494a},
- 'Motor Pool':{w:3.3,d:3.0},entry:['north','west'],tone:0x454b49},
- 'Admin Offices':{w:3.0,d:2.9},entry:['east','south'],tone:0x4a4c47}
+ 'Deep Vault':{w:3.15,d:2.9,entry:['east','south'],tone:0x343b3e},
+ 'Supply Depot':{w:2.95,d:2.8,entry:['south','west','east'],tone:0x46504c},
+ 'Pump Station':{w:2.85,d:2.8,entry:['west','south','east'],tone:0x35464a},
+ 'Power Generators':{w:2.85,d:2.8,entry:['west','north','east','south'],tone:0x343d40},
+ 'T.E.C.H. Lab':{w:2.95,d:2.9,entry:['west','east','south'],tone:0x3c4a4d},
+ 'Bio Lab':{w:2.95,d:2.85,entry:['west','north','east'],tone:0x34463f},
+ 'Medical Wing':{w:3.05,d:2.85,entry:['north','east'],tone:0x46504b},
+ 'Production Assembly':{w:3.35,d:3.05,entry:['north','east','west'],tone:0x424a49},
+ 'Data Center':{w:3.45,d:3.15,entry:['west','south'],tone:0x303c43},
+ 'Cargo Bay':{w:3.35,d:3.05,entry:['east','south'],tone:0x454c4d},
+ 'Control Room':{w:3.0,d:2.8,entry:['west','south','east'],tone:0x303b40},
+ 'Main Warehouse':{w:3.5,d:3.2,entry:['north','west','east','south'],tone:0x41494a},
+ 'Motor Pool':{w:3.3,d:3.0,entry:['north','west'],tone:0x454b49},
+ 'Admin Offices':{w:3.0,d:2.9,entry:['east','south'],tone:0x4a4c47}
 };
 function areaPosition(a){
  const [x,z]=pos(a.grid);
