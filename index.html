@@ -68,6 +68,68 @@ function buildStationObject(f,x,z){
   const tag=labelSprite('KEYCARD ENCODER','#d7d4c5');tag.position.set(x,1.75,z+.4);tag.scale.set(2.5,.48,1);gridGroup.add(tag);
  }
 }
+function buildAreaSetpiece(a,x,z){
+ const steel=new THREE.MeshStandardMaterial({color:0x505b60,metalness:.78,roughness:.48});
+ const dark=new THREE.MeshStandardMaterial({color:0x171e22,metalness:.62,roughness:.72});
+ const rubber=new THREE.MeshStandardMaterial({color:0x252c2f,roughness:.92});
+ const glass=new THREE.MeshStandardMaterial({color:0x547b80,metalness:.35,roughness:.22,transparent:true,opacity:.42});
+ const amber=new THREE.MeshStandardMaterial({color:0xd59b42,metalness:.55,roughness:.52});
+ const cyan=new THREE.MeshStandardMaterial({color:0x5faab5,emissive:0x1c6670,emissiveIntensity:1.2});
+ const green=new THREE.MeshStandardMaterial({color:0x77a77b,emissive:0x23492b,emissiveIntensity:.85});
+ const box=(w,h,d,mat,px,py,pz)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x+px,py,z+pz);m.castShadow=true;m.receiveShadow=true;gridGroup.add(m);return m};
+ const cyl=(r,h,mat,px,py,pz,rot=0)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,16),mat);m.position.set(x+px,py,z+pz);m.rotation.z=rot;m.castShadow=true;gridGroup.add(m);return m};
+ const light=(color,px,py,pz,intensity=.35)=>{const l=new THREE.PointLight(color,intensity,4,2);l.position.set(x+px,py,z+pz);gridGroup.add(l)};
+ const rack=(px,pz,h=1.55)=>{box(.48,h,.42,dark,px,h/2+.2,pz);for(let n=0;n<4;n++){box(.39,.025,.39,steel,px,.42+n*.31,pz+.02);const led=new THREE.Mesh(new THREE.BoxGeometry(.045,.06,.025),n%2?cyan:green);led.position.set(x+px+.16,.52+n*.31,z+pz+.24);gridGroup.add(led)}};
+ const name=a.name.toLowerCase();
+ if(name.includes('data center')){
+  for(const px of [-1.18,-.58,.02,.62,1.22])rack(px,-.82,1.62);
+  box(2.7,.08,.16,steel,0,1.93,-1.15);light(0x4e9ba8,0,1.5,-.8,.5);
+ }else if(name.includes('bio lab')){
+  for(const px of [-1.05,1.05]){cyl(.34,1.42,glass,px,.98,-.25);cyl(.27,.75,green,px,.76,-.25);cyl(.38,.09,steel,px,.25,-.25);cyl(.38,.08,steel,px,1.72,-.25);light(0x65a77b,px,1.2,-.25,.42)}
+  box(1.35,.12,.58,dark,0,.38,.9);box(1.18,.05,.48,steel,0,.47,.9);
+  for(const px of [-.52,.52]){cyl(.045,1.6,amber,px,1.12,.9); }
+ }else if(name.includes('production assembly')){
+  box(2.65,.18,.72,rubber,0,.43,.15);box(2.52,.09,.62,steel,0,.55,.15);
+  for(let n=0;n<8;n++){const roller=cyl(.075,.72,dark,-1.1+n*.31,.66,.15,Math.PI/2);roller.rotation.x=Math.PI/2}
+  for(const px of [-1.25,1.25]){box(.16,1.35,.18,amber,px,1.0,-.95);box(.2,.12,2.05,steel,px,1.68,-.02)}
+  box(.55,.82,.48,dark,-.95,.72,-.72);box(.38,.42,.045,cyan,-.95,1.05,-.46);
+ }else if(name.includes('deep vault')){
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(.82,.13,12,48),steel);ring.position.set(x,.98,z-1.43);gridGroup.add(ring);
+  const inner=new THREE.Mesh(new THREE.CircleGeometry(.68,48),dark);inner.position.set(x,.98,z-1.44);gridGroup.add(inner);
+  for(let n=0;n<12;n++){const a0=n*Math.PI/6,bolt=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,.07,8),amber);bolt.rotation.x=Math.PI/2;bolt.position.set(x+Math.cos(a0)*.82,.98+Math.sin(a0)*.82,z-1.34);gridGroup.add(bolt)}
+  box(1.25,.12,.22,amber,0,.3,.8);box(.72,.7,.52,dark,-1.05,.58,.2);box(.65,.7,.52,dark,1.05,.58,.2);
+ }else if(name.includes('power generator')){
+  for(const px of [-.82,.58]){box(.92,1.05,.72,dark,px,.78,-.18);for(let n=0;n<7;n++)box(.74,.035,.055,steel,px,.43+n*.12,.2);box(.12,.32,.05,amber,px+.29,.92,.23);light(0xe0a54b,px,.95,.25,.22)}
+  for(const px of [-.9,.4]){cyl(.07,2.5,steel,px,1.55,-.85,Math.PI/2)}
+ }else if(name.includes('pump station')){
+  for(const px of [-.85,.85]){cyl(.38,1.28,steel,px,.88,-.2);cyl(.31,.08,amber,px,1.54,-.2);box(.12,.34,.12,dark,px,.25,-.2)}
+  for(let n=0;n<3;n++){const pipe=cyl(.055,2.5,steel,-.8+n*.8,1.65,-.9,Math.PI/2);pipe.rotation.z=Math.PI/2}
+  box(2.8,.025,1.7,new THREE.MeshStandardMaterial({color:0x263d42,metalness:.18,roughness:.22,transparent:true,opacity:.48}),0,.22,.25);
+ }else if(name.includes('cargo bay')||name.includes('main warehouse')){
+  for(const [px,pz,py] of [[-.9,-.75,.58],[.45,-.72,.58],[-.3,.5,.58],[.85,.48,.58]]){box(.92,1.02,.78,px<0?steel:dark,px,py,pz);for(let n=0;n<3;n++)box(.94,.035,.8,amber,px,.32+n*.32,pz)}
+  box(2.9,.045,.12,amber,0,.23,1.05);
+ }else if(name.includes('control room')){
+  for(let n=0;n<3;n++){box(.82,.58,.42,dark,-.88+n*.88,.55,-.85);box(.7,.39,.035,n===1?cyan:green,-.88+n*.88,.92,-.61)}
+  box(2.8,.12,.55,steel,0,.35,-.82);
+ }else if(name.includes('medical')){
+  box(1.45,.18,.62,steel,0,.62,.05);box(1.2,.08,.48,rubber,0,.76,.05);for(const px of [-.58,.58])cyl(.035,.62,steel,px,.34,.05);
+  box(.5,.86,.38,dark,-1.18,.72,-.75);box(.38,.3,.035,green,-1.18,1.15,-.54);
+  for(let n=0;n<3;n++)box(.36,.16,.3,steel,1.12,.4+n*.3,-.65);
+ }else if(name.includes('tech lab')){
+  const chamber=new THREE.Mesh(new THREE.BoxGeometry(1.22,1.38,.88,1,1,1),glass);chamber.position.set(x-.35,.98,z-.35);gridGroup.add(chamber);
+  for(const px of [-.98,.28])for(const pz of [-.8,.1])box(.08,1.55,.08,amber,px,.98,pz);
+  box(.65,.75,.55,dark,.95,.62,.48);box(.45,.3,.035,cyan,.95,1.03,.2);light(0x5da9b4,-.35,1.3,-.35,.45);
+ }else if(name.includes('motor pool')){
+  box(2.55,.12,1.35,rubber,0,.28,.15);for(const px of [-1.15,1.15]){box(.14,1.75,.14,amber,px,1.05,-.95);box(.16,.16,2.25,steel,px,1.9,.1)}
+  for(let n=0;n<6;n++)box(.13,.025,.6,amber,-1.2+n*.48,.23,.9);
+ }else if(name.includes('admin offices')){
+  for(const px of [-.85,.55]){box(.92,.12,.55,steel,px,.72,-.25);box(.58,.38,.08,dark,px,.98,-.5);box(.5,.28,.025,cyan,px,.99,-.45);box(.12,.7,.12,dark,px,.36,-.25)}
+  box(.62,1.15,.16,amber,1.28,.88,-1.1);
+ }else if(name.includes('supply depot')){
+  for(const px of [-1.12,1.12]){box(.18,1.55,.42,dark,px,.98,-.3);for(let n=0;n<4;n++)box(.32,.06,.82,steel,px,.42+n*.35,-.3)}
+  for(const px of [-.65,.25])box(.55,.48,.52,amber,px,.48,.72);
+ }
+}
 function buildZone(a,i){
  const [x,z]=pos(a.grid),floorMat=new THREE.MeshStandardMaterial({color:i%2?0x343b3e:0x3d4447,roughness:.82,metalness:.38});
  // Industrial metal deck: inset plates, seams and restrained service markings.
@@ -111,6 +173,7 @@ function buildZone(a,i){
  const tray=addPropBox(2.8,.10,.16,0x252c2c,.75);tray.position.set(x,1.78,z-1.22);gridGroup.add(tray);
  for(let p=0;p<3;p++){const conduit=addPropBox(.055,.055,2.4,0x8a918b,.8);conduit.position.set(x-1.35+p*.12,1.48,z-.25);gridGroup.add(conduit)}
  const s=labelSprite(a.name);s.position.set(x-.05,2.05,z-.28);s.scale.set(4.8,.92,1);gridGroup.add(s);
+ buildAreaSetpiece(a,x,z);
 }
 function buildAdjacentCorridors(areas){
  const deckMat=new THREE.MeshStandardMaterial({color:0x343a3c,metalness:.72,roughness:.58});
