@@ -3,7 +3,7 @@
 <style>
 :root{--bg:#0b100d;--panel:#151d18f2;--green:#a5bd73;--cream:#eee8d6;--muted:#a4aa9a}*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--cream);font:14px system-ui,sans-serif}#view{position:absolute;inset:0}canvas{display:block;touch-action:none}header{position:absolute;top:0;left:0;right:0;padding:13px 17px;background:linear-gradient(180deg,#080c0bea 0%,#0b100d99 70%,transparent);pointer-events:none}.brand{font-weight:800;letter-spacing:.14em;font-size:11px;color:var(--green)}h1{font-size:18px;margin:4px 0;letter-spacing:.04em}.panel{position:absolute;left:13px;top:135px;width:min(290px,calc(100vw - 26px));max-height:calc(100vh - 165px);overflow:auto;background:var(--panel);border:1px solid #82965b99;border-radius:10px;padding:12px;backdrop-filter:blur(12px);box-shadow:0 10px 30px #0008}.panel h2{font-size:10px;letter-spacing:.14em;color:var(--green);margin:0 0 8px}.controls{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}button{background:#303b2c;color:var(--cream);border:1px solid #74865b;border-radius:6px;padding:8px 10px;font-size:11px;font-weight:700}.active{background:#71854e;color:#101410}#zoomControls{position:absolute;z-index:6;right:14px;top:48%;transform:translateY(-50%);display:flex;flex-direction:column;gap:7px}#zoomControls button{width:43px;height:43px;padding:0;font-size:23px;line-height:1;background:#172018ee;border:1px solid #91a66a;border-radius:8px;box-shadow:0 3px 12px #0008}.floorbar{position:absolute;z-index:5;top:75px;left:50%;transform:translateX(-50%);display:flex;gap:8px;padding:6px;background:#111811ee;border:1px solid #71845b;border-radius:10px;box-shadow:0 5px 22px #0009}.floorbar button{min-width:132px;padding:12px 14px;font-size:12px}.floorbar button.active{background:#91a66a;color:#101410;border-color:#c2d29d}.sub{font-size:10px;color:var(--muted);margin:-6px 0 10px;line-height:1.35}.note{font-size:10px;color:var(--muted);line-height:1.4;margin-top:8px}#legend{position:absolute;right:13px;bottom:13px;background:var(--panel);border:1px solid #64704c66;border-radius:8px;padding:9px 11px;font-size:10px;color:var(--muted)}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}#status{position:absolute;left:13px;bottom:13px;color:#c5cbb9;font-size:10px;background:#111711dd;padding:8px 10px;border-radius:6px;max-width:55vw}#pad{display:none;gap:5px;margin-top:8px}#pad button{min-width:38px}@media(max-width:600px){.floorbar{top:69px;width:calc(100% - 26px);justify-content:stretch}.floorbar button{flex:1;min-width:0;padding:13px 5px;font-size:11px}.panel{top:auto;bottom:54px;width:min(225px,calc(100vw - 26px));max-height:48vh}.note{display:none}h1{font-size:15px}#legend{max-width:132px}#status{bottom:10px}}
 </style></head><body><div id="view"></div><header><div class="brand">THE VETERAN LOBBY</div><h1>X01 BLACK SITE · TACTICAL EXPLORER</h1></header>
-<nav class="floorbar" aria-label="Choose X01 floor"><button id="lower" class="active">FIRST FLOOR</button><button id="upper">SECOND FLOOR</button></nav><div id="zoomControls" aria-label="Map zoom"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button></div><section class="panel"><div id="floorSub" class="sub">First Floor · verified sector references</div><h2>VIEW MODE</h2><div class="controls"><button id="orbit" class="active">3D CUTAWAY</button><button id="walk">FIRST PERSON</button><button id="reset">RESET VIEW</button></div><div class="note">3D: drag to pan · Shift+drag or right-drag to orbit · pinch to zoom · twist two fingers to rotate · + / − to zoom. First person: WASD/arrows · drag to look · mobile pad below.</div><div id="pad"><button data-move="forward">▲</button><button data-move="left">◀</button><button data-move="back">▼</button><button data-move="right">▶</button></div><div class="note">Facility sectors and navigation markers are sourced references. Sector tiles are stylised visual zones, not measured room outlines.</div></section>
+<nav class="floorbar" aria-label="Choose X01 floor"><button id="lower" class="active">FIRST FLOOR</button><button id="upper">SECOND FLOOR</button></nav><div id="zoomControls" aria-label="Map zoom"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button></div><section class="panel"><div id="floorSub" class="sub">First Floor · verified sector references</div><h2>VIEW MODE</h2><div class="controls"><button id="orbit" class="active">3D CUTAWAY</button><button id="walk">FIRST PERSON</button><button id="reset">RESET VIEW</button></div><div class="note">3D: drag to pan · Shift+drag or right-drag to orbit · pinch to zoom · twist two fingers to rotate · + / − to zoom. First person: WASD/arrows · drag to look · mobile pad below.</div><div id="pad"><button data-move="forward">▲</button><button data-move="left">◀</button><button data-move="back">▼</button><button data-move="right">▶</button></div><div class="note">Room modules, partitions and doorways are illustrative architectural detail, not verified in-game measurements. Named zones and grid references are sourced.</div></section>
 <div id="legend"><div><span class="dot" style="background:#82965b"></span>Area reference</div><div><span class="dot" style="background:#d3ae65"></span>Key room / objective</div><div><span class="dot" style="background:#6f9eb0"></span>Exfil / service</div><div><span class="dot" style="background:#a9b4a1"></span>Stairs</div><div><span class="dot" style="background:#77c5d0"></span>Ascender</div><div><span class="dot" style="background:#9cb8d0"></span>Infil point</div></div><div id="status">LOADING X01 MAP DATA…</div>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
@@ -19,6 +19,45 @@ const cols=data.grid.columns,cell=4,offset=(cols.length-1)*cell/2;
 function pos(grid){const m=grid.match(/^([A-J])(\d)$/);if(!m)return [0,0];return [(cols.indexOf(m[1])*cell)-offset,(Number(m[2])-4.5)*cell]}
 function clear(g){while(g.children.length){const o=g.children.pop();o.traverse?.(v=>{v.geometry?.dispose?.()});}}
 function labelSprite(text,color='#eee8d6'){const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');x.fillStyle='rgba(10,14,10,.78)';x.fillRect(4,4,504,120);x.strokeStyle='#82965b';x.lineWidth=3;x.strokeRect(4,4,504,120);x.fillStyle=color;x.font='bold 31px system-ui';x.textAlign='center';x.fillText(text.slice(0,27),256,76);const t=new THREE.CanvasTexture(c),s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthTest:false}));s.scale.set(5.6,1.4,1);return s}
+function addWall(x,z,w,d,h=1.05,material=matWall){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);o.position.set(x,.48+h/2,z);o.castShadow=true;o.receiveShadow=true;gridGroup.add(o);return o}
+function addDoor(x,z,axis='x'){const frameMat=matAccent;for(const side of [-.48,.48]){const p=new THREE.Mesh(new THREE.BoxGeometry(.12,.92,.12),frameMat);p.position.set(x+(axis==='x'?side:0),.98,z+(axis==='z'?side:0));gridGroup.add(p)}const lintel=new THREE.Mesh(new THREE.BoxGeometry(axis==='x'?1.08:.12,.12,axis==='z'?1.08:.12),matWall);lintel.position.set(x,1.49,z);gridGroup.add(lintel)}
+function buildZone(a,i){
+ const [x,z]=pos(a.grid),floorMat=new THREE.MeshStandardMaterial({color:i%2?0x343d38:0x3c4540,roughness:.94});
+ // Irregular facility footprint: main room plus offset service annex, rather than a single coloured sector tile.
+ const main=new THREE.Mesh(new THREE.BoxGeometry(3.45,.12,2.55),floorMat);main.position.set(x-.12,.12,z-.34);main.receiveShadow=true;gridGroup.add(main);
+ const annex=new THREE.Mesh(new THREE.BoxGeometry(1.72,.12,1.22),floorMat);annex.position.set(x+.88,.12,z+1.28);gridGroup.add(annex);
+ const trim=new THREE.Mesh(new THREE.BoxGeometry(3.55,.045,2.65),matDark);trim.position.set(x-.12,.035,z-.34);gridGroup.add(trim);
+ // Perimeter walls have deliberate openings for doorways.
+ addWall(x-1.82,z-.34,.12,2.55);addWall(x+1.58,z-.34,.12,2.55);
+ addWall(x-.12,z-1.62,3.5,.12);
+ addWall(x-1.02,z+.93,1.72,.12);addWall(x+1.08,z+.93,.96,.12);
+ addDoor(x+.38,z+.93,'x');
+ // Interior partitions create smaller rooms and service alcoves.
+ addWall(x-.28,z-.52,.10,1.28,.82);
+ addWall(x+.68,z-.96,1.15,.10,.82);
+ addDoor(x-.28,z+.12,'z');addDoor(x+.65,z-.96,'x');
+ // Door threshold and floor striping.
+ const threshold=new THREE.Mesh(new THREE.BoxGeometry(1.05,.035,.22),matAccent);threshold.position.set(x+.38,.205,z+.91);gridGroup.add(threshold);
+ for(let n=0;n<4;n++){const stripe=new THREE.Mesh(new THREE.BoxGeometry(.10,.025,.32),matPin);stripe.position.set(x+1.22+n*.16,.205,z-.34);detailGroup.add(stripe)}
+ // Ceiling-height industrial light bars and low equipment consoles.
+ for(const dx of [-.9,.72]){const lamp=new THREE.Mesh(new THREE.BoxGeometry(.72,.045,.10),new THREE.MeshBasicMaterial({color:0xb5c88a}));lamp.position.set(x+dx,1.72,z-.34);gridGroup.add(lamp)}
+ const consoleBox=new THREE.Mesh(new THREE.BoxGeometry(.55,.52,.38),matDark);consoleBox.position.set(x+.92,.48,z+.28);gridGroup.add(consoleBox);
+ const screen=new THREE.Mesh(new THREE.BoxGeometry(.42,.25,.035),new THREE.MeshBasicMaterial({color:0x6f9e91,emissive:0x24483e}));screen.position.set(x+.92,.78,z+.075);gridGroup.add(screen);
+ const s=labelSprite(a.name);s.position.set(x-.05,2.05,z-.28);s.scale.set(4.8,.92,1);gridGroup.add(s);
+}
+function buildAdjacentCorridors(areas){
+ for(let i=0;i<areas.length;i++)for(let j=i+1;j<areas.length;j++){
+  const [x1,z1]=pos(areas[i].grid),[x2,z2]=pos(areas[j].grid);
+  if(Math.abs(x1-x2)+Math.abs(z1-z2)>4.01)continue;
+  const dx=x2-x1,dz=z2-z1,midX=(x1+x2)/2,midZ=(z1+z2)/2;
+  const hall=new THREE.Mesh(new THREE.BoxGeometry(Math.abs(dx)>0?4.0:1.15,.10,Math.abs(dz)>0?4.0:1.15),new THREE.MeshStandardMaterial({color:0x252e29,roughness:.9}));
+  hall.position.set(midX,.13,midZ);gridGroup.add(hall);
+  const railMat=new THREE.MeshStandardMaterial({color:0x657365,metalness:.55,roughness:.65});
+  if(Math.abs(dx)>0){for(const side of [-.57,.57]){const rail=new THREE.Mesh(new THREE.BoxGeometry(4,.72,.09),railMat);rail.position.set(midX,.52,midZ+side);gridGroup.add(rail)}}
+  else{for(const side of [-.57,.57]){const rail=new THREE.Mesh(new THREE.BoxGeometry(.09,.72,4),railMat);rail.position.set(midX+side,.52,midZ);gridGroup.add(rail)}}
+  const line=new THREE.Mesh(new THREE.BoxGeometry(Math.abs(dx)>0?3.5:.045,.018,Math.abs(dz)>0?.045:3.5),matAccent);line.position.set(midX,.20,midZ);detailGroup.add(line);
+ }
+}
 function buildFloor(){
  clear(gridGroup);clear(markerGroup);clear(detailGroup);
  const floor=data.floors.find(f=>f.id===floorId);document.querySelector('#floorSub').textContent=floor.subtitle;
@@ -32,14 +71,7 @@ function buildFloor(){
  const grid=new THREE.GridHelper(40,10,0x70805a,0x354132);grid.position.y=-.06;gridGroup.add(grid);
  cols.forEach((letter,i)=>{const x=i*cell-offset,tag=labelSprite(letter,'#b7c99a');tag.position.set(x,.28,-21.2);tag.scale.set(.9,.55,1);detailGroup.add(tag)});
  for(let row=0;row<10;row++){const z=(row-4.5)*cell,tag=labelSprite(String(row),'#b7c99a');tag.position.set(-21.2,.28,z);tag.scale.set(.9,.55,1);detailGroup.add(tag)}
- floor.areas.forEach((a,i)=>{const [x,z]=pos(a.grid),baseMat=i%2?matArea:matArea2;
- const plinth=new THREE.Mesh(new THREE.BoxGeometry(3.72,.34,3.72),matDark);plinth.position.set(x,.13,z);plinth.receiveShadow=true;gridGroup.add(plinth);
- const tile=new THREE.Mesh(new THREE.BoxGeometry(3.48,.16,3.48),baseMat);tile.position.set(x,.38,z);tile.receiveShadow=true;gridGroup.add(tile);
- const inset=new THREE.Mesh(new THREE.BoxGeometry(3.12,.025,3.12),new THREE.MeshStandardMaterial({color:0x53634a,roughness:.9}));inset.position.set(x,.475,z);gridGroup.add(inset);
- // Four short bulkhead corners make each sector read as an industrial facility zone, not a fabricated room plan.
- for(const [dx,dz] of [[-1.55,-1.55],[1.55,-1.55],[-1.55,1.55],[1.55,1.55]]){const pillar=new THREE.Mesh(new THREE.BoxGeometry(.22,.72,.22),matWall);pillar.position.set(x+dx,.78,z+dz);gridGroup.add(pillar)}
- for(let q=-1;q<=1;q++){const stripe=new THREE.Mesh(new THREE.BoxGeometry(.24,.035,.08),matAccent);stripe.position.set(x+q*.32,.5,z-1.62);detailGroup.add(stripe)}
- const s=labelSprite(a.name);s.position.set(x,1.55,z);gridGroup.add(s)});
+ buildAdjacentCorridors(floor.areas);floor.areas.forEach((a,i)=>buildZone(a,i));
  data.markers.filter(m=>m.floor===floorId).forEach(m=>{const [x,z]=pos(m.grid),isKey=m.type==='key-room';const base=new THREE.Mesh(new THREE.CylinderGeometry(.38,.48,.22,6),isKey?matPin:matBlue);base.position.set(x,.62,z);base.castShadow=true;markerGroup.add(base);const ring=new THREE.Mesh(new THREE.TorusGeometry(.58,.045,8,28),new THREE.MeshBasicMaterial({color:isKey?0xe3b65d:0x78b6c1}));ring.rotation.x=Math.PI/2;ring.position.set(x,.76,z);markerGroup.add(ring);const s=labelSprite(m.name,isKey?'#f1d49a':'#b9dce1');s.position.set(x,2.05,z);s.scale.set(5.4,1.2,1);markerGroup.add(s)});
  (data.features||[]).filter(f=>f.floors.includes(floorId)).forEach(f=>{const [x,z]=pos(f.grid);let color=0x8fb6a0,geo=new THREE.OctahedronGeometry(.34,.0),y=1.02;
  if(f.type==='stairs'){color=0xa9b4a1;geo=new THREE.BoxGeometry(.65,.16,.65);y=.78}
