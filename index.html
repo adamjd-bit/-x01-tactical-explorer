@@ -125,7 +125,7 @@ function buildAreaSetpiece(a,x,z){
   box(1.45,.18,.62,steel,0,.62,.05);box(1.2,.08,.48,rubber,0,.76,.05);for(const px of [-.58,.58])cyl(.035,.62,steel,px,.34,.05);
   box(.5,.86,.38,dark,-1.18,.72,-.75);box(.38,.3,.035,green,-1.18,1.15,-.54);
   for(let n=0;n<3;n++)box(.36,.16,.3,steel,1.12,.4+n*.3,-.65);
- }else if(name.includes('tech lab')){
+ }else if(name.includes('tech lab')||name.includes('tech')){
   const chamber=new THREE.Mesh(new THREE.BoxGeometry(1.22,1.38,.88,1,1,1),glass);chamber.position.set(x-.35,.98,z-.35);gridGroup.add(chamber);
   for(const px of [-.98,.28])for(const pz of [-.8,.1])box(.08,1.55,.08,amber,px,.98,pz);
   box(.65,.75,.55,dark,.95,.62,.48);box(.45,.3,.035,cyan,.95,1.03,.2);light(0x5da9b4,-.35,1.3,-.35,.45);
@@ -146,7 +146,7 @@ const roomProfiles={
  'Pump Station':{w:3.1,d:3.2,entry:['west','south','east'],tone:0x35464a},
  'Power Generators':{w:3.1,d:3.2,entry:['west','north','east','south'],tone:0x343d40},
  'T.E.C.H. Lab':{w:3.3,d:3.4,entry:['west','east','south'],tone:0x3c4a4d},
- 'Bio Lab':{w:3.3,d:3.3,entry:['west','north'],tone:0x34463f},
+ 'Bio Lab':{w:3.3,d:3.3,entry:['west','north','east'],tone:0x34463f},
  'Medical Wing':{w:3.8,d:3.3,entry:['north','east'],tone:0x46504b},
  'Production Assembly':{w:4.5,d:3.8,entry:['north','east','west'],tone:0x424a49},
  'Data Center':{w:4.8,d:4.0,entry:['west','south'],tone:0x303c43},
