@@ -76,14 +76,43 @@ function makeSurfaceTexture(base,kind='wall'){
 }
 const wallTexture=makeSurfaceTexture('#626b6d','wall');wallTexture.repeat.set(1.2,1.0);
 const floorTexture=makeSurfaceTexture('#596164','floor');floorTexture.repeat.set(1,1);
-const matFloor=new THREE.MeshStandardMaterial({color:0x9da6a3,roughness:.96,map:floorTexture}),matArea=new THREE.MeshStandardMaterial({color:0x43563e,roughness:.86,metalness:.12}),matArea2=new THREE.MeshStandardMaterial({color:0x303f36,roughness:.86,metalness:.12}),matPin=new THREE.MeshStandardMaterial({color:0xe3b65d,emissive:0x54300a}),matBlue=new THREE.MeshStandardMaterial({color:0x78b6c1,emissive:0x12343b}),matWall=new THREE.MeshStandardMaterial({color:0x9aa3a2,metalness:.28,roughness:.91,map:wallTexture,bumpMap:wallTexture,bumpScale:.045}),matAccent=new THREE.MeshStandardMaterial({color:0x9cae70,emissive:0x18250e}),matDark=new THREE.MeshStandardMaterial({color:0x101713,metalness:.35,roughness:.7});
+const matFloor=new THREE.MeshStandardMaterial({color:0x9da6a3,roughness:.96,map:floorTexture}),matArea=new THREE.MeshStandardMaterial({color:0x43563e,roughness:.86,metalness:.12}),matArea2=new THREE.MeshStandardMaterial({color:0x303f36,roughness:.86,metalness:.12}),matPin=new THREE.MeshStandardMaterial({color:0xe3b65d,emissive:0x54300a}),matBlue=new THREE.MeshStandardMaterial({color:0x78b6c1,emissive:0x12343b}),matWall=new THREE.MeshStandardMaterial({color:0xffffff,metalness:.28,roughness:.91,map:wallTexture,bumpMap:wallTexture,bumpScale:.045}),matAccent=new THREE.MeshStandardMaterial({color:0x9cae70,emissive:0x18250e}),matDark=new THREE.MeshStandardMaterial({color:0x101713,metalness:.35,roughness:.7});
 const target=new THREE.Vector3(0,0,0);let mode='orbit',floorId='lower',yaw=Math.PI,pitch=0,keys={},moveHeld=null,dragging=false,dragAction='pan',lastX=0,lastY=0,pointers=new Map(),pinchDistance=0;
 const data=await fetch('./data/x01-map-data.json').then(r=>{if(!r.ok)throw Error('Map data request failed: '+r.status);return r.json()});
 const cols=data.grid.columns,cell=4,offset=(cols.length-1)*cell/2;
 function pos(grid){const m=grid.match(/^([A-J])(\d)$/);if(!m)return [0,0];return [(cols.indexOf(m[1])*cell)-offset,(Number(m[2])-4.5)*cell]}
 function clear(g){while(g.children.length){const o=g.children.pop();o.traverse?.(v=>{v.geometry?.dispose?.()});}}
 function labelSprite(text,color='#eee8d6'){const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');x.fillStyle='rgba(10,14,10,.78)';x.fillRect(4,4,504,120);x.strokeStyle='#82965b';x.lineWidth=3;x.strokeRect(4,4,504,120);x.fillStyle=color;x.font='bold 31px system-ui';x.textAlign='center';x.fillText(text.slice(0,27),256,76);const t=new THREE.CanvasTexture(c),s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthTest:true}));s.scale.set(3.8,.78,1);return s}
-function addWall(x,z,w,d,h=1.05,material=matWall){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);o.position.set(x,.18+h/2,z);o.castShadow=true;o.receiveShadow=true;gridGroup.add(o);return o}
+function addWall(x,z,w,d,h=1.05,material=matWall){
+ const wall=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);
+ wall.position.set(x,.18+h/2,z);wall.castShadow=true;wall.receiveShadow=true;gridGroup.add(wall);
+ // Industrial cladding on both faces: modular plates, bolted seams and impact rails.
+ if(h>1.5){
+  const long=w>=d,span=Math.max(w,d),count=Math.max(1,Math.floor(span/.82));
+  const cladding=new THREE.MeshStandardMaterial({color:0x929b98,metalness:.38,roughness:.78});
+  const seam=new THREE.MeshStandardMaterial({color:0x303a3c,metalness:.5,roughness:.7});
+  const rail=new THREE.MeshStandardMaterial({color:0x30393b,metalness:.62,roughness:.66});
+  for(const face of [-1,1]){
+   for(let n=0;n<count;n++){
+    const len=span/count-.045,along=-span/2+(n+.5)*span/count;
+    const panel=new THREE.Mesh(new THREE.BoxGeometry(long?len:.035,1.38,long?.035:len),cladding);
+    panel.position.set(x+(long?along:face*(w/2+.025)),.18+h*.55,z+(long?face*(d/2+.025):along));gridGroup.add(panel);
+    const joint=new THREE.Mesh(new THREE.BoxGeometry(long?.035:.045,1.42,long?.045:.035),seam);
+    joint.position.set(x+(long?along+len/2+.018:face*(w/2+.048)),.18+h*.55,z+(long?face*(d/2+.048):along+len/2+.018));gridGroup.add(joint);
+    for(const yy of [.18+h*.55-.58,.18+h*.55+.58]){
+     const bolt=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,.025,8),rail);
+     bolt.rotation.x=Math.PI/2;
+     bolt.position.set(x+(long?along:face*(w/2+.055)),yy,z+(long?face*(d/2+.055):along));gridGroup.add(bolt);
+    }
+   }
+   const impact=new THREE.Mesh(new THREE.BoxGeometry(long?span:.09,.18,long?.09:span),rail);
+   impact.position.set(x,.39,z);gridGroup.add(impact);
+  }
+  const cap=new THREE.Mesh(new THREE.BoxGeometry(w+.06,.10,d+.06),rail);
+  cap.position.set(x,.18+h,z);gridGroup.add(cap);
+ }
+ return wall;
+}
 function addDoor(x,z,axis='x'){
  const frame=new THREE.MeshStandardMaterial({color:0x9a7045,metalness:.58,roughness:.62});
  const leafMat=new THREE.MeshStandardMaterial({color:0x75472f,metalness:.48,roughness:.72});
@@ -238,7 +267,7 @@ function wallOpening(cx,cz,w,d,side,opening,h=2.72,material=matWall){
 function buildZone(a,i){
  const [x,z]=areaPosition(a),p=roomProfiles[a.name]||{w:3.8,d:3.4,entry:['south'],tone:0x3d4647};
  const {w,d}=p;
- const roomFloorMap=floorTexture.clone();roomFloorMap.repeat.set(Math.max(1,w/2),Math.max(1,d/2));roomFloorMap.needsUpdate=true;const concrete=new THREE.MeshStandardMaterial({color:p.tone,roughness:.96,metalness:.08,map:roomFloorMap,bumpMap:roomFloorMap,bumpScale:.035});
+ const roomFloorMap=floorTexture.clone();roomFloorMap.repeat.set(Math.max(1,w/2),Math.max(1,d/2));roomFloorMap.needsUpdate=true;const concrete=new THREE.MeshStandardMaterial({color:0xb4bbb6,roughness:.96,metalness:.08,map:roomFloorMap,bumpMap:roomFloorMap,bumpScale:.035});
  const steel=new THREE.MeshStandardMaterial({color:0x657176,roughness:.78,metalness:.52});
  const darkSteel=new THREE.MeshStandardMaterial({color:0x222a2d,roughness:.82,metalness:.48});
  const floor=new THREE.Mesh(new THREE.BoxGeometry(w,.18,d),concrete);
@@ -262,7 +291,7 @@ function buildZone(a,i){
  const trim=new THREE.Mesh(new THREE.BoxGeometry(w+.12,.08,d+.12),darkSteel);
  trim.position.set(x,.075,z);gridGroup.add(trim);
  // Full-height concrete/steel bulkheads with actual door openings.
- const bulkhead=new THREE.MeshStandardMaterial({color:0x667176,roughness:.86,metalness:.3,map:wallTexture});
+ const bulkhead=new THREE.MeshStandardMaterial({color:0xe1e5df,roughness:.88,metalness:.22,map:wallTexture,bumpMap:wallTexture,bumpScale:.04});
  for(const side of ['north','south','east','west']){
   if(p.entry.includes(side))wallOpening(x,z,w,d,side,1.62,2.05,bulkhead);
   else if(side==='north'||side==='south')addWall(x,z+(side==='north'?-d/2:d/2),w,.18,2.05,bulkhead);
