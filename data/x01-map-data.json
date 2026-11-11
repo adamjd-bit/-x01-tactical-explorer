@@ -14,6 +14,12 @@
       "url": "https://dmzcodex.com/map/x01-black-site/",
       "checked": "2026-11-12",
       "notes": "Cross-reference for named facility areas and their grid sectors, stairs, ascenders and other map layers."
+    },
+    {
+      "name": "DMZMap X01 interactive map and floor guide",
+      "url": "https://dmzmap.com/x01/map",
+      "checked": "2026-11-12",
+      "notes": "Used for stairs, ascenders, exfil, arrival-point and facility service sector references. All coordinates are sector references, not measured room geometry."
     }
   ],
   "grid": {
@@ -205,6 +211,304 @@
     "Grid references identify sectors, not exact positions within a sector.",
     "Some key-room sectors in DMZHUB differ from other community map references; key-room markers intentionally follow the user-supplied DMZHUB source.",
     "Room outlines, corridors, doors, stairs, elevations and exact marker positions are not inferred from grid references.",
-    "Dynamic exits, spawns, loot, weapon lockers, ascenders and enemy locations are not yet plotted in this verified layer."
+    "Dynamic exits, spawns, loot, weapon lockers, ascenders and enemy locations are not yet plotted in this verified layer.",
+    "Stairs, ascenders, exfils, spawns and service markers are shown at sector level; exact positions inside each sector are not measured."
+  ],
+  "features": [
+    {
+      "name": "Stairs",
+      "grid": "C4",
+      "floors": [
+        "lower",
+        "upper"
+      ],
+      "type": "stairs"
+    },
+    {
+      "name": "Stairs",
+      "grid": "C5",
+      "floors": [
+        "lower",
+        "upper"
+      ],
+      "type": "stairs"
+    },
+    {
+      "name": "Stairs",
+      "grid": "E5",
+      "floors": [
+        "lower",
+        "upper"
+      ],
+      "type": "stairs"
+    },
+    {
+      "name": "Stairs",
+      "grid": "F2",
+      "floors": [
+        "lower",
+        "upper"
+      ],
+      "type": "stairs"
+    },
+    {
+      "name": "Stairs",
+      "grid": "F4",
+      "floors": [
+        "lower",
+        "upper"
+      ],
+      "type": "stairs"
+    },
+    {
+      "name": "Stairs",
+      "grid": "F6",
+      "floors": [
+        "lower",
+        "upper"
+      ],
+      "type": "stairs"
+    },
+    {
+      "name": "Stairs",
+      "grid": "G4",
+      "floors": [
+        "lower",
+        "upper"
+      ],
+      "type": "stairs"
+    },
+    {
+      "name": "Stairs",
+      "grid": "G5",
+      "floors": [
+        "lower",
+        "upper"
+      ],
+      "type": "stairs"
+    },
+    {
+      "name": "Stairs",
+      "grid": "G6",
+      "floors": [
+        "lower",
+        "upper"
+      ],
+      "type": "stairs"
+    },
+    {
+      "name": "Rope Ascender",
+      "grid": "C5",
+      "floors": [
+        "lower",
+        "upper"
+      ],
+      "type": "ascender"
+    },
+    {
+      "name": "Rope Ascender",
+      "grid": "G2",
+      "floors": [
+        "lower",
+        "upper"
+      ],
+      "type": "ascender"
+    },
+    {
+      "name": "Rope Ascender",
+      "grid": "H3",
+      "floors": [
+        "lower",
+        "upper"
+      ],
+      "type": "ascender"
+    },
+    {
+      "name": "Emergency Exfil",
+      "grid": "C4",
+      "floors": [
+        "lower"
+      ],
+      "type": "exfil"
+    },
+    {
+      "name": "Emergency Exfil",
+      "grid": "E2",
+      "floors": [
+        "upper"
+      ],
+      "type": "exfil"
+    },
+    {
+      "name": "Exfil Lift",
+      "grid": "E4",
+      "floors": [
+        "lower",
+        "upper"
+      ],
+      "type": "exfil"
+    },
+    {
+      "name": "Exfil Lift",
+      "grid": "G5",
+      "floors": [
+        "lower",
+        "upper"
+      ],
+      "type": "exfil"
+    },
+    {
+      "name": "Exfil Lift",
+      "grid": "F8",
+      "floors": [
+        "lower",
+        "upper"
+      ],
+      "type": "exfil"
+    },
+    {
+      "name": "Exfil Lift",
+      "grid": "I3",
+      "floors": [
+        "lower"
+      ],
+      "type": "exfil"
+    },
+    {
+      "name": "Generator Emergency Gate",
+      "grid": "H3",
+      "floors": [
+        "lower"
+      ],
+      "type": "exfil"
+    },
+    {
+      "name": "3D Printer",
+      "grid": "E5",
+      "floors": [
+        "lower"
+      ],
+      "type": "station"
+    },
+    {
+      "name": "Keycard Encoder",
+      "grid": "F2",
+      "floors": [
+        "lower"
+      ],
+      "type": "station"
+    },
+    {
+      "name": "Keycard Encoder",
+      "grid": "I5",
+      "floors": [
+        "lower"
+      ],
+      "type": "station"
+    },
+    {
+      "name": "Hidden Stash Passage",
+      "grid": "F5",
+      "floors": [
+        "lower"
+      ],
+      "type": "secret"
+    },
+    {
+      "name": "Infil Point",
+      "grid": "E2",
+      "floors": [
+        "lower"
+      ],
+      "type": "spawn"
+    },
+    {
+      "name": "Infil Point",
+      "grid": "D6",
+      "floors": [
+        "lower"
+      ],
+      "type": "spawn"
+    },
+    {
+      "name": "Infil Point",
+      "grid": "D5",
+      "floors": [
+        "lower"
+      ],
+      "type": "spawn"
+    },
+    {
+      "name": "Infil Point",
+      "grid": "C4",
+      "floors": [
+        "lower"
+      ],
+      "type": "spawn"
+    },
+    {
+      "name": "Infil Point",
+      "grid": "I4",
+      "floors": [
+        "lower"
+      ],
+      "type": "spawn"
+    },
+    {
+      "name": "Infil Point",
+      "grid": "H6",
+      "floors": [
+        "lower"
+      ],
+      "type": "spawn"
+    },
+    {
+      "name": "Infil Point",
+      "grid": "H2",
+      "floors": [
+        "lower"
+      ],
+      "type": "spawn"
+    },
+    {
+      "name": "Infil Point",
+      "grid": "E2",
+      "floors": [
+        "upper"
+      ],
+      "type": "spawn"
+    },
+    {
+      "name": "Infil Point",
+      "grid": "E5",
+      "floors": [
+        "upper"
+      ],
+      "type": "spawn"
+    },
+    {
+      "name": "Infil Point",
+      "grid": "H3",
+      "floors": [
+        "upper"
+      ],
+      "type": "spawn"
+    },
+    {
+      "name": "Infil Point",
+      "grid": "G6",
+      "floors": [
+        "upper"
+      ],
+      "type": "spawn"
+    },
+    {
+      "name": "Infil Point",
+      "grid": "B5",
+      "floors": [
+        "upper"
+      ],
+      "type": "spawn"
+    }
   ]
 }
