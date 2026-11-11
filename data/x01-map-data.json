@@ -1,7 +1,7 @@
 {
   "project": "The Veteran Lobby — X01 Tactical Explorer",
   "schemaVersion": 3,
-  "dataStatus": "Area grid references cross-checked against DMZ Codex; key-room sector references follow the user-supplied DMZHUB source. This is a sector map, not a measured architectural floorplan.",
+  "dataStatus": "Area sectors aligned to COD Central's November 11 X01 tac-map reference. Architectural geometry is a 3D reconstruction guided by the published floor-plan map and gameplay references; room dimensions and wall runs remain approximate.",
   "sources": [
     {
       "name": "DMZHUB X01 Black Site Interactive Map",
@@ -20,6 +20,12 @@
       "url": "https://dmzmap.com/x01/map",
       "checked": "2026-11-12",
       "notes": "Used for stairs, ascenders, exfil, arrival-point and facility service sector references. All coordinates are sector references, not measured room geometry."
+    },
+    {
+      "name": "COD Central X01 floor plan and area grid reference",
+      "url": "https://codcentral.net/blog/mw4-dmz-map/",
+      "checked": "2026-11-12",
+      "notes": "Used for both-floor area grid references and the published Data Center floor-plan image. Floor-plan geometry is reconstructed, not game-extracted."
     }
   ],
   "grid": {
@@ -68,7 +74,7 @@
         },
         {
           "name": "Power Generators",
-          "grid": "H3"
+          "grid": "G3"
         },
         {
           "name": "T.E.C.H. Lab",
@@ -84,7 +90,7 @@
         },
         {
           "name": "Production Assembly",
-          "grid": "F5"
+          "grid": "E5"
         },
         {
           "name": "Data Center",
@@ -99,7 +105,7 @@
       "areas": [
         {
           "name": "Cargo Bay",
-          "grid": "F2"
+          "grid": "E2"
         },
         {
           "name": "Control Room",
@@ -107,19 +113,19 @@
         },
         {
           "name": "Power Generators",
-          "grid": "H3"
+          "grid": "G3"
         },
         {
           "name": "Admin Offices",
-          "grid": "D5"
+          "grid": "C4"
         },
         {
           "name": "Main Warehouse",
-          "grid": "F4"
+          "grid": "F5"
         },
         {
           "name": "Motor Pool",
-          "grid": "F7"
+          "grid": "E7"
         }
       ]
     }
