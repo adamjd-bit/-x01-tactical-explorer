@@ -1,7 +1,7 @@
 {
   "project": "The Veteran Lobby — X01 Tactical Explorer",
   "schemaVersion": 3,
-  "dataStatus": "Area sectors aligned to COD Central's November 11 X01 tac-map reference. Architectural geometry is a 3D reconstruction guided by the published floor-plan map and gameplay references; room dimensions and wall runs remain approximate.",
+  "dataStatus": "Sector positions reconciled against the November 12 COD Central X01 floor guide and current DMZ Codex X01 map. Sector coordinates are verified references; room outlines, exact dimensions, wall runs and corridor routes remain reconstruction work pending direct gameplay references.",
   "sources": [
     {
       "name": "DMZHUB X01 Black Site Interactive Map",
@@ -22,10 +22,16 @@
       "notes": "Used for stairs, ascenders, exfil, arrival-point and facility service sector references. All coordinates are sector references, not measured room geometry."
     },
     {
-      "name": "COD Central X01 floor plan and area grid reference",
+      "name": "COD Central MW4 DMZ Map — X01 Both Floors",
       "url": "https://codcentral.net/blog/mw4-dmz-map/",
-      "checked": "2026-11-12",
-      "notes": "Used for both-floor area grid references and the published Data Center floor-plan image. Floor-plan geometry is reconstructed, not game-extracted."
+      "checked": "2026-11-13",
+      "notes": "Cross-check for both-floor named area sectors; article updated November 12, 2026. Note: the published Power Generators sector conflicts with the current DMZ Codex map, so it is retained as a flagged discrepancy pending in-game verification."
+    },
+    {
+      "name": "Official Call of Duty Season 1 X01 announcement",
+      "url": "https://www.callofduty.com/blog/2026/10/call-of-duty-modern-warfare-4-warzone-season-1-announcement",
+      "checked": "2026-11-13",
+      "notes": "Official environmental brief: dimly lit labyrinthine passageways, tunnels, linking chambers, weapons assembly line, cargo bays, vehicle depots, underground labs, production lines and sealed Deep Vault."
     }
   ],
   "grid": {
@@ -74,7 +80,7 @@
         },
         {
           "name": "Power Generators",
-          "grid": "G3"
+          "grid": "H3"
         },
         {
           "name": "T.E.C.H. Lab",
@@ -113,11 +119,11 @@
         },
         {
           "name": "Power Generators",
-          "grid": "G3"
+          "grid": "H3"
         },
         {
           "name": "Admin Offices",
-          "grid": "C4"
+          "grid": "D5"
         },
         {
           "name": "Main Warehouse",
@@ -215,10 +221,11 @@
   ],
   "limitations": [
     "Grid references identify sectors, not exact positions within a sector.",
-    "Some key-room sectors in DMZHUB differ from other community map references; key-room markers intentionally follow the user-supplied DMZHUB source.",
     "Room outlines, corridors, doors, stairs, elevations and exact marker positions are not inferred from grid references.",
     "Dynamic exits, spawns, loot, weapon lockers, ascenders and enemy locations are not yet plotted in this verified layer.",
-    "Stairs, ascenders, exfils, spawns and service markers are shown at sector level; exact positions inside each sector are not measured."
+    "Stairs, ascenders, exfils, spawns and service markers are shown at sector level; exact positions inside each sector are not measured.",
+    "COD Central (updated 12 Nov 2026) lists Power Generators at G3, while the current DMZ Codex map places it at H3 on both floors. The reconstruction uses H3 provisionally and flags it for in-game screenshot verification.",
+    "The map's area sectors are verified references only; they do not establish precise room footprints, corridor routes, wall geometry, door positions or vertical alignment."
   ],
   "features": [
     {
