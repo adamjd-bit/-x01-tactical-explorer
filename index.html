@@ -497,9 +497,31 @@ function touchPairAngle(a,b){return Math.atan2(b.clientY-a.clientY,b.clientX-a.c
 function tiltBy(delta){if(mode!=='orbit')return;const off=camera.position.clone().sub(target),s=new THREE.Spherical().setFromVector3(off);s.phi=Math.max(.015,Math.min(1.48,s.phi+delta));camera.position.copy(target).add(new THREE.Vector3().setFromSpherical(s));camera.lookAt(target)}
 function angleDelta(next,prev){return Math.atan2(Math.sin(next-prev),Math.cos(next-prev))}
 function zoomBy(factor){if(mode==='orbit'){const off=camera.position.clone().sub(target);off.setLength(Math.max(8,Math.min(110,off.length()*factor)));camera.position.copy(target).add(off);camera.lookAt(target)}else{camera.fov=Math.max(28,Math.min(82,camera.fov/factor));camera.updateProjectionMatrix()}}
-function setMode(m){mode=m;document.querySelector('#orbit').classList.toggle('active',m==='orbit');document.querySelector('#walk').classList.toggle('active',m==='walk');document.querySelector('#pad').style.display=m==='walk'?'flex':'none';if(m==='walk'){camera.position.set(0,1.7,17);yaw=Math.PI;pitch=0}else{camera.position.set(26,24,29);camera.lookAt(target)}}
-function selectFloor(id){const nextY=id==='upper'?4.3:0,delta=nextY-target.y;floorId=id;document.querySelector('#lower').classList.toggle('active',id==='lower');document.querySelector('#upper').classList.toggle('active',id==='upper');if(blenderModel){if(blenderFloors.lower)blenderFloors.lower.visible=id==='lower';if(blenderFloors.upper)blenderFloors.upper.visible=id==='upper';target.y=nextY;if(mode==='walk'){camera.position.y=nextY+1.7}else{camera.position.y+=delta;camera.lookAt(target)}document.querySelector('#status').textContent=(id==='lower'?'FIRST':'SECOND')+' FLOOR · BLENDER RECONSTRUCTION';}else buildFloor()}
-document.querySelector('#lower').onclick=()=>selectFloor('lower');document.querySelector('#upper').onclick=()=>selectFloor('upper');document.querySelector('#orbit').onclick=()=>setMode('orbit');document.querySelector('#walk').onclick=()=>setMode('walk');document.querySelector('#reset').onclick=()=>{target.set(0,0,0);setMode('orbit')};
+function frameBlenderFloor(id=floorId){
+ const root=blenderFloors[id];if(!root)return;
+ const bounds=new THREE.Box3().setFromObject(root);if(bounds.isEmpty())return;
+ const size=bounds.getSize(new THREE.Vector3()),center=bounds.getCenter(new THREE.Vector3());
+ target.copy(center);
+ // A stable elevated three-quarter view, fitted to the actual floor dimensions
+ // and current screen aspect ratio (especially important on portrait phones).
+ const direction=new THREE.Vector3(1,.82,1).normalize();
+ camera.position.copy(center).add(direction);
+ camera.lookAt(center);camera.updateMatrixWorld(true);
+ const right=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,0);
+ const up=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,1);
+ const half=size.clone().multiplyScalar(.5);
+ const halfWidth=Math.abs(right.x)*half.x+Math.abs(right.y)*half.y+Math.abs(right.z)*half.z;
+ const halfHeight=Math.abs(up.x)*half.x+Math.abs(up.y)*half.y+Math.abs(up.z)*half.z;
+ const halfDepth=Math.abs(direction.x)*half.x+Math.abs(direction.y)*half.y+Math.abs(direction.z)*half.z;
+ const vFov=THREE.MathUtils.degToRad(camera.fov);
+ const hFov=2*Math.atan(Math.tan(vFov/2)*camera.aspect);
+ const distance=(Math.max(halfWidth/Math.tan(hFov/2),halfHeight/Math.tan(vFov/2))+halfDepth)*1.12;
+ camera.position.copy(center).addScaledVector(direction,distance);
+ camera.lookAt(center);
+}
+function setMode(m){mode=m;document.querySelector('#orbit').classList.toggle('active',m==='orbit');document.querySelector('#walk').classList.toggle('active',m==='walk');document.querySelector('#pad').style.display=m==='walk'?'flex':'none';if(m==='walk'){camera.position.set(0,1.7,17);yaw=Math.PI;pitch=0}else if(blenderModel){frameBlenderFloor(floorId)}else{camera.position.set(26,24,29);camera.lookAt(target)}}
+function selectFloor(id){floorId=id;document.querySelector('#lower').classList.toggle('active',id==='lower');document.querySelector('#upper').classList.toggle('active',id==='upper');if(blenderModel){if(blenderFloors.lower)blenderFloors.lower.visible=id==='lower';if(blenderFloors.upper)blenderFloors.upper.visible=id==='upper';if(mode==='walk'){target.y=id==='upper'?5.7:1.4;camera.position.y=target.y+1.7}else frameBlenderFloor(id);document.querySelector('#status').textContent=(id==='lower'?'FIRST':'SECOND')+' FLOOR · BLENDER RECONSTRUCTION';}else buildFloor()}
+document.querySelector('#lower').onclick=()=>selectFloor('lower');document.querySelector('#upper').onclick=()=>selectFloor('upper');document.querySelector('#orbit').onclick=()=>setMode('orbit');document.querySelector('#walk').onclick=()=>setMode('walk');document.querySelector('#reset').onclick=()=>setMode('orbit');
 function getPinchDistance(){const p=[...pointers.values()];return p.length<2?0:Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y)}
 renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});renderer.domElement.setPointerCapture(e.pointerId);if(pointers.size===1){dragging=true;dragAction=(e.button===2||e.shiftKey)?'orbit':'pan';lastX=e.clientX;lastY=e.clientY}else{dragging=false;pinchDistance=getPinchDistance()}});
 renderer.domElement.addEventListener('pointerup',e=>{if(e.pointerType==='touch')return;pointers.delete(e.pointerId);pinchDistance=0;if(pointers.size===1){const p=[...pointers.values()][0];lastX=p.x;lastY=p.y;dragging=true}else dragging=false});
@@ -528,6 +550,7 @@ new GLTFLoader().load('./assets/x01-reconstruction.glb',gltf=>{
  blenderFloors.lower.visible=floorId==='lower';blenderFloors.upper.visible=floorId==='upper';
  scene.add(blenderModel);
  gridGroup.visible=false;markerGroup.visible=false;detailGroup.visible=false;
+ if(mode==='orbit')frameBlenderFloor(floorId);
  document.querySelector('#status').textContent='BLENDER ENVIRONMENT LOADED · '+(floorId==='lower'?'FIRST':'SECOND')+' FLOOR';
 },undefined,error=>{console.error('Blender GLB load failed',error);document.querySelector('#status').textContent='BLENDER MODEL UNAVAILABLE · SHOWING WEB FALLBACK';});
 animate();addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
