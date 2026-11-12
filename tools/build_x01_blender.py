@@ -219,6 +219,18 @@ for floor in DATA["floors"]:
         if m["floor"]!=fid: continue
         x,z=sector(m["grid"]); cyl("Key room marker",(x,y+.20,z),.24,.08,amber,col,24)
         text_obj(m["name"],(x,y+2.82,z),.14,col)
+# Preserve the two Blender collections as named roots in the exported GLB.
+# The web viewer uses these nodes to switch floors without rebuilding geometry.
+for fid, (col, floor_y) in floors.items():
+    root_obj=bpy.data.objects.new("FLOOR_"+fid.upper()+"_ROOT", None)
+    col.objects.link(root_obj)
+    root_obj.empty_display_type="PLAIN_AXES"
+    root_obj.location=(0,0,0)
+    for obj in list(col.objects):
+        if obj is root_obj: continue
+        obj.parent=root_obj
+        obj.matrix_parent_inverse=root_obj.matrix_world.inverted()
+
 # Scene metadata and export.
 scene=bpy.context.scene
 scene.render.engine="BLENDER_EEVEE_NEXT" if hasattr(bpy.types,"BLENDER_EEVEE_NEXT") else "BLENDER_EEVEE"
