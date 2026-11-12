@@ -21,11 +21,44 @@ def move_to(obj, col):
     for c in list(obj.users_collection): c.objects.unlink(obj)
     col.objects.link(obj); return obj
 def mat(name, color, metallic=0.0, rough=.7, emission=None, estr=0.0):
+    # Procedural PBR surface: layered tonal breakup, fine aggregate and micro-relief.
+    # These are shader-generated materials, not AI image textures or claimed game rips.
     m=bpy.data.materials.new(name); m.diffuse_color=(*color,1); m.use_nodes=True
-    bs=m.node_tree.nodes.get("Principled BSDF"); bs.inputs["Base Color"].default_value=(*color,1)
-    bs.inputs["Metallic"].default_value=metallic; bs.inputs["Roughness"].default_value=rough
+    nt=m.node_tree; nt.nodes.clear()
+    out=nt.nodes.new("ShaderNodeOutputMaterial"); out.location=(620,80)
+    bs=nt.nodes.new("ShaderNodeBsdfPrincipled"); bs.location=(360,80)
+    bs.inputs["Metallic"].default_value=metallic
+    bs.inputs["Roughness"].default_value=rough
+    tex=nt.nodes.new("ShaderNodeTexCoord"); tex.location=(-820,120)
+    broad=nt.nodes.new("ShaderNodeTexNoise"); broad.location=(-610,210)
+    broad.inputs["Scale"].default_value=7.5 if metallic < .35 else 24.0
+    broad.inputs["Detail"].default_value=5.0
+    broad.inputs["Roughness"].default_value=.78
+    nt.links.new(tex.outputs["Generated"],broad.inputs["Vector"])
+    ramp=nt.nodes.new("ShaderNodeValToRGB"); ramp.location=(-340,230)
+    base=color
+    def tint(v):
+        return (max(0,min(1,v[0])),max(0,min(1,v[1])),max(0,min(1,v[2])),1)
+    ramp.color_ramp.elements[0].position=.18
+    ramp.color_ramp.elements[0].color=tint(tuple(c*.58 for c in base))
+    ramp.color_ramp.elements[1].position=.82
+    ramp.color_ramp.elements[1].color=tint(tuple(c*1.22 for c in base))
+    nt.links.new(broad.outputs["Fac"],ramp.inputs["Fac"])
+    nt.links.new(ramp.outputs["Color"],bs.inputs["Base Color"])
+    fine=nt.nodes.new("ShaderNodeTexNoise"); fine.location=(-600,-160)
+    fine.inputs["Scale"].default_value=145.0 if metallic > .35 else 68.0
+    fine.inputs["Detail"].default_value=2.5
+    fine.inputs["Roughness"].default_value=.82
+    nt.links.new(tex.outputs["Generated"],fine.inputs["Vector"])
+    bump=nt.nodes.new("ShaderNodeBump"); bump.location=(100,-100)
+    bump.inputs["Strength"].default_value=.22 if metallic < .35 else .14
+    bump.inputs["Distance"].default_value=.035 if rough > .7 else .012
+    nt.links.new(fine.outputs["Fac"],bump.inputs["Height"])
+    nt.links.new(bump.outputs["Normal"],bs.inputs["Normal"])
+    nt.links.new(bs.outputs["BSDF"],out.inputs["Surface"])
     if emission:
-        bs.inputs["Emission Color"].default_value=(*emission,1); bs.inputs["Emission Strength"].default_value=estr
+        bs.inputs["Emission Color"].default_value=(*emission,1)
+        bs.inputs["Emission Strength"].default_value=estr
     return m
 concrete=mat("Worn poured concrete",(0.29,.32,.32),0,.92)
 floor_mat=mat("Industrial sealed concrete",(0.20,.23,.23),.12,.84)
@@ -56,11 +89,10 @@ def sector(g):
     col=ord(g[0])-ord("A"); row=int(g[1])
     return (col*4-18, (row-4.5)*4)
 def center(a, floor):
-    x,z=sector(a["grid"]); n=a["name"]
-    if n=="Pump Station": x-=2
-    if n=="Power Generators": x+=2
-    if n=="Control Room" and floor=="upper": x-=1.8
-    return x,z
+    # Room anchors follow the published X01 sector grid. Do not offset rooms
+    # to compensate for old duplicate-sector guesses; source conflicts stay
+    # documented in x01-map-data.json until confirmed by in-game references.
+    return sector(a["grid"])
 def cube(name, loc, scale, material, col, bevel=0):
     bpy.ops.mesh.primitive_cube_add(size=1, location=loc); o=bpy.context.object; o.name=name
     o.dimensions=scale; bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
@@ -123,6 +155,18 @@ def room(a, floor, col, y):
     for zz in [-1,1]:
         cube("Ceiling cross beam",(x,y+2.48,z+zz*(d/2-.12)),(w,.18,.14),steel,col,.025)
     cube("Cable tray",(x,y+2.30,z-d*.30),(w*.72,.10,.20),dark,col,.02)
+    # Service conduits, junction boxes, industrial light fittings and safety details.
+    for side in [-1,1]:
+        conduit=cyl("Wall conduit",(x+side*(w/2-.30),y+2.03,z),.035,d*.82,steel,col,12,(math.pi/2,0,0))
+        cube("Electrical junction box",(x+side*(w/2-.29),y+1.78,z-d*.22),(.16,.22,.20),dark,col,.025)
+    lightmat=mat("Cool white industrial emitter",(.72,.80,.73),.05,.3,(.62,.78,.68),2.8)
+    for dx in [-w*.25,w*.25]:
+        cube("Recessed industrial ceiling light",(x+dx,y+2.56,z),(.78,.055,.20),lightmat,col,.025)
+        cube("Light housing",(x+dx,y+2.61,z),(.90,.07,.28),steel,col,.02)
+    # Drain channel and bolted service plates break up otherwise uniform floors.
+    cube("Floor drainage channel",(x-w*.34,y+.125,z),(.22,.025,d*.62),dark,col,.01)
+    for k in range(5):
+        cube("Drain grate bar",(x-w*.34,y+.145,z-d*.27+k*d*.135),(.24,.025,.035),steel,col,.006)
     # Functional set dressing per room type.
     low=n.lower()
     if "data center" in low or "admin offices" in low or "control room" in low:
