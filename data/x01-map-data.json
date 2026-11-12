@@ -25,7 +25,7 @@
       "name": "COD Central MW4 DMZ Map — X01 Both Floors",
       "url": "https://codcentral.net/blog/mw4-dmz-map/",
       "checked": "2026-11-13",
-      "notes": "Cross-check for both-floor named area sectors; article updated November 12, 2026. Note: the published Power Generators sector conflicts with the current DMZ Codex map, so it is retained as a flagged discrepancy pending in-game verification."
+      "notes": "Cross-check for both-floor named area sectors; article updated November 12, 2026. Some area coordinates conflict with DMZ Codex and DMZMap; disagreements are recorded for screenshot verification."
     },
     {
       "name": "Official Call of Duty Season 1 X01 announcement",
@@ -111,7 +111,7 @@
       "areas": [
         {
           "name": "Cargo Bay",
-          "grid": "E2"
+          "grid": "F2"
         },
         {
           "name": "Control Room",
