@@ -32,11 +32,13 @@ window.addEventListener('unhandledrejection',e=>{const s=document.querySelector(
 </script>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
 const host=document.querySelector('#view'),scene=new THREE.Scene();scene.background=new THREE.Color(0x151b1d);scene.fog=new THREE.Fog(0x151b1d,68,145);
 const camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,500);camera.position.set(26,24,29);
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.35));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=false;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.28;host.appendChild(renderer.domElement);
 scene.add(new THREE.HemisphereLight(0xc4d2d5,0x39413d,1.35));const sun=new THREE.DirectionalLight(0xe0e8e8,2.0);sun.position.set(15,35,20);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
 const gridGroup=new THREE.Group(),markerGroup=new THREE.Group(),detailGroup=new THREE.Group();scene.add(gridGroup,markerGroup,detailGroup);
+let blenderModel=null,blenderFloors={lower:null,upper:null};
 function makeSurfaceTexture(base,kind='wall'){
  const c=document.createElement('canvas');c.width=1024;c.height=1024;const g=c.getContext('2d');
  g.fillStyle=base;g.fillRect(0,0,1024,1024);
@@ -492,7 +494,8 @@ function tiltBy(delta){if(mode!=='orbit')return;const off=camera.position.clone(
 function angleDelta(next,prev){return Math.atan2(Math.sin(next-prev),Math.cos(next-prev))}
 function zoomBy(factor){if(mode==='orbit'){const off=camera.position.clone().sub(target);off.setLength(Math.max(8,Math.min(110,off.length()*factor)));camera.position.copy(target).add(off);camera.lookAt(target)}else{camera.fov=Math.max(28,Math.min(82,camera.fov/factor));camera.updateProjectionMatrix()}}
 function setMode(m){mode=m;document.querySelector('#orbit').classList.toggle('active',m==='orbit');document.querySelector('#walk').classList.toggle('active',m==='walk');document.querySelector('#pad').style.display=m==='walk'?'flex':'none';if(m==='walk'){camera.position.set(0,1.7,17);yaw=Math.PI;pitch=0}else{camera.position.set(26,24,29);camera.lookAt(target)}}
-document.querySelector('#lower').onclick=()=>{floorId='lower';buildFloor()};document.querySelector('#upper').onclick=()=>{floorId='upper';buildFloor()};document.querySelector('#orbit').onclick=()=>setMode('orbit');document.querySelector('#walk').onclick=()=>setMode('walk');document.querySelector('#reset').onclick=()=>{target.set(0,0,0);setMode('orbit')};
+function selectFloor(id){const nextY=id==='upper'?4.3:0,delta=nextY-target.y;floorId=id;document.querySelector('#lower').classList.toggle('active',id==='lower');document.querySelector('#upper').classList.toggle('active',id==='upper');if(blenderModel){if(blenderFloors.lower)blenderFloors.lower.visible=id==='lower';if(blenderFloors.upper)blenderFloors.upper.visible=id==='upper';target.y=nextY;if(mode==='walk'){camera.position.y=nextY+1.7}else{camera.position.y+=delta;camera.lookAt(target)}document.querySelector('#status').textContent=(id==='lower'?'FIRST':'SECOND')+' FLOOR · BLENDER RECONSTRUCTION';}else buildFloor()}
+document.querySelector('#lower').onclick=()=>selectFloor('lower');document.querySelector('#upper').onclick=()=>selectFloor('upper');document.querySelector('#orbit').onclick=()=>setMode('orbit');document.querySelector('#walk').onclick=()=>setMode('walk');document.querySelector('#reset').onclick=()=>{target.set(0,0,0);setMode('orbit')};
 function getPinchDistance(){const p=[...pointers.values()];return p.length<2?0:Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y)}
 renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});renderer.domElement.setPointerCapture(e.pointerId);if(pointers.size===1){dragging=true;dragAction=(e.button===2||e.shiftKey)?'orbit':'pan';lastX=e.clientX;lastY=e.clientY}else{dragging=false;pinchDistance=getPinchDistance()}});
 renderer.domElement.addEventListener('pointerup',e=>{if(e.pointerType==='touch')return;pointers.delete(e.pointerId);pinchDistance=0;if(pointers.size===1){const p=[...pointers.values()][0];lastX=p.x;lastY=p.y;dragging=true}else dragging=false});
@@ -512,5 +515,16 @@ document.querySelector('#zoomIn').onclick=()=>zoomBy(.82);document.querySelector
 addEventListener('keydown',e=>keys[e.key.toLowerCase()]=true);addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
 document.querySelectorAll('[data-move]').forEach(b=>{b.onpointerdown=()=>moveHeld=b.dataset.move;b.onpointerup=b.onpointerleave=b.onpointercancel=()=>moveHeld=null});
 function animate(){requestAnimationFrame(animate);if(mode==='walk'){camera.rotation.order='YXZ';camera.rotation.set(pitch,yaw,0);const f=(keys.w||keys.arrowup||moveHeld==='forward'?1:0)-(keys.s||keys.arrowdown||moveHeld==='back'?1:0),s=(keys.d||keys.arrowright||moveHeld==='right'?1:0)-(keys.a||keys.arrowleft||moveHeld==='left'?1:0);const v=new THREE.Vector3(s,0,-f).applyAxisAngle(new THREE.Vector3(0,1,0),yaw);if(v.lengthSq())v.normalize();camera.position.addScaledVector(v,.14);camera.position.y=1.7;camera.position.x=Math.max(-19,Math.min(19,camera.position.x));camera.position.z=Math.max(-19,Math.min(19,camera.position.z))}renderer.render(scene,camera)}
-buildFloor();animate();addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+buildFloor();
+new GLTFLoader().load('./assets/x01-reconstruction.glb',gltf=>{
+ blenderModel=gltf.scene;
+ blenderFloors.lower=blenderModel.getObjectByName('FLOOR_LOWER_ROOT');
+ blenderFloors.upper=blenderModel.getObjectByName('FLOOR_UPPER_ROOT');
+ if(!blenderFloors.lower||!blenderFloors.upper){throw new Error('Blender floor groups were not found in the GLB');}
+ blenderFloors.lower.visible=floorId==='lower';blenderFloors.upper.visible=floorId==='upper';
+ scene.add(blenderModel);
+ gridGroup.visible=false;markerGroup.visible=false;detailGroup.visible=false;
+ document.querySelector('#status').textContent='BLENDER ENVIRONMENT LOADED · '+(floorId==='lower'?'FIRST':'SECOND')+' FLOOR';
+},undefined,error=>{console.error('Blender GLB load failed',error);document.querySelector('#status').textContent='BLENDER MODEL UNAVAILABLE · SHOWING WEB FALLBACK';});
+animate();addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 </script></body></html>
