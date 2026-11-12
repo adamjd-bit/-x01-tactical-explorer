@@ -111,6 +111,7 @@ def mat(name, color, metallic=0.0, rough=.7, emission=None, estr=0.0):
     lname=name.lower()
     if "sealed" in lname or "floor" in lname: asset="concrete_floor_01"
     elif "concrete" in lname or "poured" in lname: asset="concrete"
+    elif "corrugated" in lname: asset="corrugated_iron"
     elif "steel" in lname or "metal" in lname or "graphite" in lname: asset="rusty_painted_metal"
     if asset:
         uv=nt.nodes.new("ShaderNodeTexCoord"); uv.location=(-820,-360)
@@ -148,6 +149,7 @@ def mat(name, color, metallic=0.0, rough=.7, emission=None, estr=0.0):
 concrete=mat("Worn poured concrete",(0.29,.32,.32),0,.92)
 floor_mat=mat("Industrial sealed concrete",(0.20,.23,.23),.12,.84)
 steel=mat("Oxidised structural steel",(.19,.23,.24),.72,.48)
+panelmetal=mat("Corrugated service steel",(.22,.27,.27),.66,.56)
 dark=mat("Graphite equipment",(.045,.06,.065),.5,.62)
 trim=mat("Safety olive",(.29,.34,.19),.35,.58)
 amber=mat("Hazard amber",(.82,.39,.075),.35,.45, (.25,.07,.01),.3)
