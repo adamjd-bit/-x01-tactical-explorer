@@ -1,4 +1,4 @@
-import bpy, json, math, os, sys
+import bpy, json, math, os, sys, urllib.request, urllib.error
 from mathutils import Vector
 
 # X01 Black Site procedural reconstruction builder.
@@ -20,6 +20,67 @@ def collection(name):
 def move_to(obj, col):
     for c in list(obj.users_collection): c.objects.unlink(obj)
     col.objects.link(obj); return obj
+# Download real photographic CC0 PBR maps from Poly Haven at build time.
+# If the service is unavailable, the procedural shader below remains a safe fallback.
+TEXTURE_DIR=os.path.join(os.path.dirname(out) or ".", "textures")
+os.makedirs(TEXTURE_DIR,exist_ok=True)
+PH_MAPS={}
+def flatten_file_records(node, trail=()):
+    if isinstance(node,dict):
+        if isinstance(node.get("url"),str):
+            yield (trail,node)
+        else:
+            for key,value in node.items():
+                yield from flatten_file_records(value,trail+(str(key),))
+    elif isinstance(node,list):
+        for index,value in enumerate(node):
+            yield from flatten_file_records(value,trail+(str(index),))
+def fetch_polyhaven_asset(slug):
+    try:
+        req=urllib.request.Request("https://api.polyhaven.com/files/"+slug,headers={"User-Agent":"X01TacticalExplorer/1.0 (Poly Haven CC0 texture pipeline)"})
+        with urllib.request.urlopen(req,timeout=25) as response:
+            payload=json.loads(response.read().decode("utf-8"))
+        records=list(flatten_file_records(payload))
+        def choose(kind):
+            ranked=[]
+            for trail,item in records:
+                url=item["url"].lower()
+                key="/".join(trail).lower()+" "+url
+                if not url.endswith((".jpg",".jpeg",".png",".tif",".tiff")): continue
+                if kind=="diff" and not any(x in key for x in ("diff","albedo","color")): continue
+                if kind=="normal" and not any(x in key for x in ("nor_gl","normal")): continue
+                if kind=="rough" and "rough" not in key: continue
+                score=(100 if "1k" in key else 50 if "2k" in key else 0)+(20 if url.endswith(".jpg") else 0)
+                ranked.append((score,item["url"]))
+            return sorted(ranked,reverse=True)[0][1] if ranked else None
+        for kind in ("diff","normal","rough"):
+            url=choose(kind)
+            if not url: continue
+            ext=".jpg" if ".jpg" in url.lower() else ".png"
+            path=os.path.join(TEXTURE_DIR,slug+"_"+kind+ext)
+            if not os.path.isfile(path) or os.path.getsize(path)<1024:
+                req=urllib.request.Request(url,headers={"User-Agent":"X01TacticalExplorer/1.0"})
+                with urllib.request.urlopen(req,timeout=60) as response,open(path,"wb") as target:
+                    target.write(response.read())
+            if os.path.getsize(path)>1024:
+                PH_MAPS[(slug,kind)]=path
+        print("Poly Haven CC0:",slug,[k[1] for k in PH_MAPS if k[0]==slug])
+    except Exception as exc:
+        print("Poly Haven texture fallback:",slug,str(exc))
+for asset in ("concrete","concrete_floor_01","rusty_painted_metal","corrugated_iron"):
+    fetch_polyhaven_asset(asset)
+
+def image_node(nt,path,label,location,color_space="sRGB"):
+    if not path: return None
+    try:
+        image=bpy.data.images.load(path,check_existing=True)
+        image.colorspace_settings.name=color_space
+        node=nt.nodes.new("ShaderNodeTexImage"); node.image=image; node.label=label
+        node.location=location; node.extension="REPEAT"
+        return node
+    except Exception as exc:
+        print("Texture image load fallback:",path,str(exc)); return None
+
 def mat(name, color, metallic=0.0, rough=.7, emission=None, estr=0.0):
     # Procedural PBR surface: layered tonal breakup, fine aggregate and micro-relief.
     # These are shader-generated materials, not AI image textures or claimed game rips.
@@ -45,6 +106,28 @@ def mat(name, color, metallic=0.0, rough=.7, emission=None, estr=0.0):
     ramp.color_ramp.elements[1].color=tint(tuple(c*1.22 for c in base))
     nt.links.new(broad.outputs["Fac"],ramp.inputs["Fac"])
     nt.links.new(ramp.outputs["Color"],bs.inputs["Base Color"])
+    # Prefer photographed CC0 albedo/normal/roughness maps for the matching surface.
+    asset=None
+    lname=name.lower()
+    if "concrete" in lname and "floor" in lname: asset="concrete_floor_01"
+    elif "concrete" in lname or "poured" in lname: asset="concrete"
+    elif "steel" in lname or "metal" in lname or "graphite" in lname: asset="rusty_painted_metal"
+    if asset:
+        uv=nt.nodes.new("ShaderNodeTexCoord"); uv.location=(-820,-360)
+        diff=image_node(nt,PH_MAPS.get((asset,"diff")),"Poly Haven CC0 albedo",(-570,-360),"sRGB")
+        normal=image_node(nt,PH_MAPS.get((asset,"normal")),"Poly Haven CC0 normal",(-570,-610),"Non-Color")
+        roughmap=image_node(nt,PH_MAPS.get((asset,"rough")),"Poly Haven CC0 roughness",(-570,-850),"Non-Color")
+        if diff:
+            nt.links.new(uv.outputs["Generated"],diff.inputs["Vector"])
+            nt.links.new(diff.outputs["Color"],bs.inputs["Base Color"])
+        if roughmap:
+            nt.links.new(uv.outputs["Generated"],roughmap.inputs["Vector"])
+            nt.links.new(roughmap.outputs["Color"],bs.inputs["Roughness"])
+        if normal:
+            nt.links.new(uv.outputs["Generated"],normal.inputs["Vector"])
+            normalmap=nt.nodes.new("ShaderNodeNormalMap"); normalmap.location=(80,-430)
+            nt.links.new(normal.outputs["Color"],normalmap.inputs["Color"])
+            nt.links.new(normalmap.outputs["Normal"],bs.inputs["Normal"])
     fine=nt.nodes.new("ShaderNodeTexNoise"); fine.location=(-600,-160)
     fine.inputs["Scale"].default_value=145.0 if metallic > .35 else 68.0
     fine.inputs["Detail"].default_value=2.5
