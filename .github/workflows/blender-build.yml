@@ -27,10 +27,12 @@ jobs:
       - name: Build X01 3D environment
         run: |
           mkdir -p assets
-          blender --background --factory-startup --python tools/build_x01_blender.py -- --input data/x01-map-data.json --output assets/x01-reconstruction.glb
+          blender --background --factory-startup --python tools/build_x01_blender.py -- --input data/x01-map-data.json --output assets/x01-reconstruction.glb --blend assets/x01-reconstruction.blend
       - name: Publish generated environment artifact
         uses: actions/upload-artifact@v4
         with:
           name: x01-blender-glb
-          path: assets/x01-reconstruction.glb
+          path: |
+            assets/x01-reconstruction.glb
+            assets/x01-reconstruction.blend
           if-no-files-found: error
