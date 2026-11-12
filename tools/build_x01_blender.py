@@ -244,7 +244,7 @@ def room(a, floor, col, y):
     cube("Cable tray",(x,y+2.30,z-d*.30),(w*.72,.10,.20),dark,col,.02)
     # Service conduits, junction boxes, industrial light fittings and safety details.
     for side in [-1,1]:
-        conduit=cyl("Wall conduit",(x+side*(w/2-.30),y+2.03,z),.035,d*.82,steel,col,12,(math.pi/2,0,0))
+        conduit=cyl("Wall conduit",(x+side*(w/2-.30),y+2.03,z),.035,d*.82,steel,col,12,(0,0,0))
         cube("Electrical junction box",(x+side*(w/2-.29),y+1.78,z-d*.22),(.16,.22,.20),dark,col,.025)
     lightmat=mat("Cool white industrial emitter",(.72,.80,.73),.05,.3,(.62,.78,.68),2.8)
     for dx in [-w*.25,w*.25]:
