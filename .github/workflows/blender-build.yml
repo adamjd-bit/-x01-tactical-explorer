@@ -1,0 +1,36 @@
+name: Build X01 Blender environment
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "data/x01-map-data.json"
+      - "tools/build_x01_blender.py"
+      - ".github/workflows/blender-build.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: "blender-build"
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Install Blender
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender
+      - name: Build X01 3D environment
+        run: |
+          mkdir -p assets
+          blender --background --factory-startup --python tools/build_x01_blender.py -- --input data/x01-map-data.json --output assets/x01-reconstruction.glb
+      - name: Publish generated environment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: x01-blender-glb
+          path: assets/x01-reconstruction.glb
+          if-no-files-found: error
