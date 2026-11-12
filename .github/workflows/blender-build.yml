@@ -8,7 +8,7 @@ on:
       - ".github/workflows/blender-build.yml"
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 concurrency:
@@ -28,6 +28,17 @@ jobs:
         run: |
           mkdir -p assets
           blender --background --factory-startup --python tools/build_x01_blender.py -- --input data/x01-map-data.json --output assets/x01-reconstruction.glb --blend assets/x01-reconstruction.blend
+      - name: Publish GLB to the website source
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/x01-reconstruction.glb
+          if git diff --cached --quiet; then
+            echo "No GLB changes to commit"
+          else
+            git commit -m "Publish rebuilt X01 Blender environment"
+            git push
+          fi
       - name: Publish generated environment artifact
         uses: actions/upload-artifact@v4
         with:
