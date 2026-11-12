@@ -8,6 +8,7 @@ def arg(flag, default):
     return args[args.index(flag)+1] if flag in args and args.index(flag)+1 < len(args) else default
 src = arg("--input", "data/x01-map-data.json")
 out = arg("--output", "assets/x01-reconstruction.glb")
+blend_out = arg("--blend", "assets/x01-reconstruction.blend")
 with open(src, "r", encoding="utf-8") as f: DATA=json.load(f)
 
 bpy.ops.object.select_all(action="SELECT"); bpy.ops.object.delete(use_global=False)
@@ -227,6 +228,8 @@ scene.world.color=(.045,.055,.06)
 bpy.ops.object.light_add(type="AREA", location=(0,14,-12)); bpy.context.object.data.energy=2400; bpy.context.object.data.shape="DISK"; bpy.context.object.data.size=16
 bpy.ops.object.camera_add(location=(34,42,-46)); cam=bpy.context.object; cam.rotation_euler=(math.radians(42),0,math.radians(35)); cam.data.lens=48; scene.camera=cam
 os.makedirs(os.path.dirname(out) or ".",exist_ok=True)
+os.makedirs(os.path.dirname(blend_out) or ".",exist_ok=True)
+bpy.ops.wm.save_as_mainfile(filepath=blend_out)
 bpy.ops.object.select_all(action="SELECT")
 bpy.ops.export_scene.gltf(filepath=out,export_format="GLB",use_selection=True,export_apply=True)
 print("X01 Blender build complete:",out)
