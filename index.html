@@ -500,11 +500,13 @@ function zoomBy(factor){if(mode==='orbit'){const off=camera.position.clone().sub
 function frameBlenderFloor(id=floorId){
  const root=blenderFloors[id];if(!root)return;
  const bounds=new THREE.Box3().setFromObject(root);if(bounds.isEmpty())return;
- const size=bounds.getSize(new THREE.Vector3()),center=bounds.getCenter(new THREE.Vector3());
+ const size=bounds.getSize(new THREE.Vector3());
+ // Aim at the actual floor-plan centre and walking-surface elevation,
+ // rather than the vertical midpoint of walls, equipment and labels.
+ const center=new THREE.Vector3(0,id==='upper'?4.3:0,0);
  target.copy(center);
- // A stable elevated three-quarter view, fitted to the actual floor dimensions
- // and current screen aspect ratio (especially important on portrait phones).
- const direction=new THREE.Vector3(1,.82,1).normalize();
+ // Steeper elevated three-quarter view for a clear open-top plan on phones.
+ const direction=new THREE.Vector3(1,1.65,1).normalize();
  camera.position.copy(center).add(direction);
  camera.lookAt(center);camera.updateMatrixWorld(true);
  const right=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,0);
@@ -515,7 +517,7 @@ function frameBlenderFloor(id=floorId){
  const halfDepth=Math.abs(direction.x)*half.x+Math.abs(direction.y)*half.y+Math.abs(direction.z)*half.z;
  const vFov=THREE.MathUtils.degToRad(camera.fov);
  const hFov=2*Math.atan(Math.tan(vFov/2)*camera.aspect);
- const distance=(Math.max(halfWidth/Math.tan(hFov/2),halfHeight/Math.tan(vFov/2))+halfDepth)*1.12;
+ const distance=(Math.max(halfWidth/Math.tan(hFov/2),halfHeight/Math.tan(vFov/2))+halfDepth)*1.18;
  camera.position.copy(center).addScaledVector(direction,distance);
  camera.lookAt(center);
 }
