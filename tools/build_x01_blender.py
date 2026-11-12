@@ -109,7 +109,7 @@ def mat(name, color, metallic=0.0, rough=.7, emission=None, estr=0.0):
     # Prefer photographed CC0 albedo/normal/roughness maps for the matching surface.
     asset=None
     lname=name.lower()
-    if "concrete" in lname and "floor" in lname: asset="concrete_floor_01"
+    if "sealed" in lname or "floor" in lname: asset="concrete_floor_01"
     elif "concrete" in lname or "poured" in lname: asset="concrete"
     elif "steel" in lname or "metal" in lname or "graphite" in lname: asset="rusty_painted_metal"
     if asset:
@@ -137,6 +137,8 @@ def mat(name, color, metallic=0.0, rough=.7, emission=None, estr=0.0):
     bump.inputs["Strength"].default_value=.22 if metallic < .35 else .14
     bump.inputs["Distance"].default_value=.035 if rough > .7 else .012
     nt.links.new(fine.outputs["Fac"],bump.inputs["Height"])
+    if "normalmap" in locals() and normalmap:
+        nt.links.new(normalmap.outputs["Normal"],bump.inputs["Normal"])
     nt.links.new(bump.outputs["Normal"],bs.inputs["Normal"])
     nt.links.new(bs.outputs["BSDF"],out.inputs["Surface"])
     if emission:
@@ -368,6 +370,10 @@ bpy.ops.object.light_add(type="AREA", location=(0,14,-12)); bpy.context.object.d
 bpy.ops.object.camera_add(location=(34,42,-46)); cam=bpy.context.object; cam.rotation_euler=(math.radians(42),0,math.radians(35)); cam.data.lens=48; scene.camera=cam
 os.makedirs(os.path.dirname(out) or ".",exist_ok=True)
 os.makedirs(os.path.dirname(blend_out) or ".",exist_ok=True)
+for image in bpy.data.images:
+    if image.source=="FILE":
+        try: image.pack()
+        except Exception as exc: print("Could not pack image",image.name,str(exc))
 bpy.ops.wm.save_as_mainfile(filepath=blend_out)
 bpy.ops.object.select_all(action="SELECT")
 bpy.ops.export_scene.gltf(filepath=out,export_format="GLB",use_selection=True,export_apply=True)
