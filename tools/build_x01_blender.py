@@ -113,6 +113,7 @@ def mat(name, color, metallic=0.0, rough=.7, emission=None, estr=0.0):
     elif "concrete" in lname or "poured" in lname: asset="concrete"
     elif "corrugated" in lname: asset="corrugated_iron"
     elif "steel" in lname or "metal" in lname or "graphite" in lname: asset="rusty_painted_metal"
+    normalmap=None
     if asset:
         uv=nt.nodes.new("ShaderNodeTexCoord"); uv.location=(-820,-360)
         diff=image_node(nt,PH_MAPS.get((asset,"diff")),"Poly Haven CC0 albedo",(-570,-360),"sRGB")
@@ -280,6 +281,13 @@ def room(a, floor, col, y):
         for ix in [-1,1]:
             cube("Assembly gantry upright",(x+ix*1.25,y+1.2,z-d*.28),(.15,1.5,.16),amber,col,.02)
         cube("Overhead gantry beam",(x,y+1.9,z-d*.28),(w*.82,.16,.18),steel,col,.025)
+        # Signature X01 in-world 3D printer beside the weapons assembly line.
+        cube("X01 industrial 3D printer base",(x+w*.27,y+.62,z+d*.25),(.92,1.05,.82),steel,col,.055)
+        cube("3D printer build chamber",(x+w*.27,y+1.38,z+d*.25),(.76,.62,.68),glass,col,.035)
+        for ix in [-1,1]:
+            cube("Printer vertical actuator",(x+w*.27+ix*.31,y+1.39,z+d*.25),(.045,.72,.045),amber,col,.008)
+        cube("Printer build plate",(x+w*.27,y+1.06,z+d*.25),(.52,.055,.48),dark,col,.015)
+        cube("Printer touchscreen",(x+w*.27+.47,y+1.20,z+d*.25-.10),(.035,.28,.22),cyan,col,.01)
     elif "generator" in low or "pump" in low:
         for ix in [-1,1]:
             cube("Industrial generator housing",(x+ix*.68,y+.76,z),(.85,1.2,1.05),dark,col,.06)
@@ -288,10 +296,28 @@ def room(a, floor, col, y):
         for ix in range(3):
             cyl("Overhead pipe run",(x-w*.32+ix*.65,y+2.08,z+d*.28),.055,w*.55,steel,col,16,(0,math.pi/2,0))
     elif "vault" in low:
-        cyl("Vault locking ring",(x,y+.15,z),1.0,.10,amber,col,48)
-        cube("Vault secure container",(x,y+.72,z), (1.55,1.35,.95),dark,col,.08)
+        # Deep Vault: three visible gallery tiers around a central elevator and core.
+        cyl("Vault primary locking ring",(x,y+.20,z),1.18,.14,amber,col,64)
+        cyl("Vault inner pressure seal",(x,y+.29,z),.91,.08,steel,col,64)
+        cube("Central elevator platform",(x,y+.52,z),(1.45,.16,1.45),dark,col,.06)
+        cube("Elevator control pedestal",(x,y+1.08,z+.95),(.42,.95,.32),steel,col,.04)
+        cube("Elevator status screen",(x,y+1.30,z+.78),(.30,.24,.045),green,col,.015)
+        for level in range(3):
+            yy=y+.34+level*.82
+            bpy.ops.mesh.primitive_torus_add(major_radius=1.28,minor_radius=.055,major_segments=48,minor_segments=8,location=(x,yy,z))
+            ring=bpy.context.object; ring.name="Vault gallery ring level "+str(level+1); ring.data.materials.append(steel); move_to(ring,col)
+            for angle in [0,math.pi/2,math.pi,math.pi*1.5]:
+                px=x+1.22*math.cos(angle); pz=z+1.22*math.sin(angle)
+                cube("Vault gallery support",(px,yy-.34,pz),(.12,.72,.12),steel,col,.018)
+            for ix in [-1,1]:
+                cube("Numbered vault compartment",(x+ix*1.05,yy+.22,z-.88),(.72,.48,.28),dark,col,.035)
+                cube("Vault compartment indicator",(x+ix*1.05,yy+.22,z-1.04),(.24,.13,.025),amber,col,.01)
+        cyl("Deep Vault core containment",(x,y+2.34,z),.46,.92,glass,col,48)
+        cyl("Core containment crown",(x,y+2.83,z),.53,.12,amber,col,48)
         for ix in [-1,1]:
             cyl("Vault locking wheel",(x+ix*.88,y+1.0,z-.5),.28,.10,steel,col,32,(math.pi/2,0,0))
+        cube("Emergency escape shaft hatch",(x+1.20,y+1.25,z+1.0),(.68,.12,.68),amber,col,.025)
+        cyl("Vault escape zipline",(x+1.20,y+1.65,z+1.0),.025,2.8,steel,col,12)
     elif "medical" in low or "test chamber" in low or "tech" in low:
         cube("Examination bench",(x,y+.52,z),(w*.62,.18,.72),steel,col,.04)
         for ix in [-1,1]:
@@ -305,6 +331,19 @@ def room(a, floor, col, y):
         if "motor" in low:
             for ix in [-1,1]:
                 cube("Vehicle bay floor marking",(x+ix*.9,y+.13,z),(.08,.025,d*.72),amber,col)
+                vx=x+ix*.88
+                cube("Armoured vehicle chassis",(vx,y+.68,z),(.82,.62,1.42),dark,col,.10)
+                cube("Armoured vehicle upper hull",(vx,y+1.12,z-.08),(.70,.42,.92),steel,col,.07)
+                cube("Armoured vehicle windscreen",(vx,y+1.20,z-.55),(.58,.28,.045),glass,col,.02)
+                for wz in [-.48,.42]:
+                    for wx in [-.40,.40]:
+                        cyl("Armoured vehicle wheel",(vx+wx,y+.42,z+wz),.20,.13,dark,col,24,(0,math.pi/2,0))
+        elif "cargo" in low or "warehouse" in low:
+            for ix in [-1,1]:
+                for level in range(2):
+                    cube("Ribbed freight container",(x+ix*.72,y+.62+level*.82,z-.18),(.82,.72,1.22),trim if level==0 else steel,col,.045)
+                    for rib in range(5):
+                        cube("Container corrugation",(x+ix*.72-.43,y+.36+level*.82+rib*.13,z-.18),(.035,.055,1.16),dark,col,.008)
     text_obj(n,(x,y+2.72,z),.27,col)
 
 floors={}
